@@ -163,7 +163,7 @@ retained as product evidence rather than hidden.
 
 Baseline desk:
 
-- root: `/Users/ame/autoquant-v0917-correction-baseline`;
+- root: `/Users/ame/2607AutoQuant/grok-field-trials/legacy-root-cleanup/autoquant-v0917-correction-baseline`;
 - exact wheel: `auto_quant-0.9.16-py3-none-any.whl`, SHA-256
   `116f6bb2c3054713538c26d9b9a3a4114a0ac89d58c7ff3375c47ac4a359dad5`;
 - Grok session: `019fbc84-c2d6-7570-9e41-e93a62a65012`;
@@ -199,7 +199,7 @@ Candidate implementation focused verification:
 
 Candidate installed-wheel replay:
 
-- root: `/Users/ame/autoquant-v0917-correction-candidate`;
+- root: `/Users/ame/2607AutoQuant/grok-field-trials/legacy-root-cleanup/autoquant-v0917-correction-candidate`;
 - candidate wheel: `auto_quant-0.9.17-py3-none-any.whl`, SHA-256
   `16d182ce4e7800ca8b28576e185300014ac199909fd5dadc2563fbe2562235a0`;
 - Grok session: `019fbc9e-26ac-7410-8135-e52b378c4526`;

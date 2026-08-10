@@ -111,7 +111,7 @@ runtime-package closure.
   and runtime closure hash
   `afa1b49e7a83465e81db696ac5aea2f5bb6504784bb4ca0d21016a3653fc4e36`.
 - Final isolated field Workspace:
-  `/Users/ame/autoquant-v0923-build-provenance-field-retry`.
+  `/Users/ame/2607AutoQuant/grok-field-trials/legacy-root-cleanup/autoquant-v0923-build-provenance-field-retry`.
   Grok session `019fbe75-3878-7a10-8de1-78e81b1ffc9c` created Run
   `run-20260801T175455537825Z-60ef712dc897` and Report
   `report-20260801T175531501814Z-f47425637678`; independent public-surface

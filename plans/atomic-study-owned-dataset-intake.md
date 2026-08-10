@@ -38,7 +38,7 @@ intake. To finish, the worker had to:
   validation failure was not one atomic user action.
 
 The worker ultimately produced the requested shape at
-`/Users/ame/autoquant-v0918-recovery-final-candidate`, but success depended on
+`/Users/ame/2607AutoQuant/grok-field-trials/legacy-root-cleanup/autoquant-v0918-recovery-final-candidate`, but success depended on
 private source knowledge. That is useful baseline evidence, not acceptable
 Agent ergonomics.
 
@@ -179,7 +179,7 @@ candidate CLI explicitly first on `PATH`.
 
 The isolated installed-wheel replay used Grok session
 `019fbd45-86de-7010-8302-b5d6a0cc8670` at
-`/Users/ame/autoquant-v0919-durability-final-candidate`. It added exactly Study
+`/Users/ame/2607AutoQuant/grok-field-trials/legacy-root-cleanup/autoquant-v0919-durability-final-candidate`. It added exactly Study
 `ohlcv-book-path-recovery-durability`, succeeded Run
 `run-20260801T122535519420Z-84653e611761`, and published Report
 `report-20260801T122614364560Z-0f9aa1ab8b38`, with zero Sessions. The Study

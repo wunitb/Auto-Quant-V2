@@ -223,7 +223,7 @@ Its single successful Run proved the new evidence but reproduced the empty-
 baseline-correlation CLI failure.
 
 Final isolated release audit:
-`/Users/ame/autoquant-v0914-release-audit`. The exact wheel SHA-256 is
+`/Users/ame/2607AutoQuant/grok-field-trials/legacy-root-cleanup/autoquant-v0914-release-audit`. The exact wheel SHA-256 is
 `d9e346234a1a8fa7c6e4dac4e70d0e91c505938dca18aef2d12192e7634b6355`;
 Grok session `019fbbd5-ca4a-7b01-ac69-7ac0a3419bf6` is preserved in
 `grok-transcript.md`. Installed-wheel `aq validate` and strict

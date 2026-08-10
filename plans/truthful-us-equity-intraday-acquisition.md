@@ -40,7 +40,7 @@ route evidence.
 Authoritative baseline:
 
 - Grok session `255af841-8e51-41bf-80c2-385d503c26d1`;
-- field root `/Users/ame/autoquant-v0919-multiinterval-baseline`;
+- field root `/Users/ame/2607AutoQuant/grok-field-trials/legacy-root-cleanup/autoquant-v0919-multiinterval-baseline`;
 - Project `hourly-reversal-desk` under `desk/workspace`;
 - exact fixed window `2024-08-01` through `2026-07-31` on XNYS regular
   sessions, with `1h` base and completed prior-session `1d` context;

@@ -185,7 +185,7 @@ The research interpretation is frozen before the worker starts:
 ## Verification
 
 Baseline trial:
-`/Users/ame/autoquant-v0915-path-stress-baseline`. The exact released wheel
+`/Users/ame/2607AutoQuant/grok-field-trials/legacy-root-cleanup/autoquant-v0915-path-stress-baseline`. The exact released wheel
 SHA-256 is
 `d21d3cc3b86eebc18d4a3805a71507f316c7eef8a15bf4e70bbcf096d11af553`;
 Python is 3.11.14 and the installed CLI reports `aq 0.9.14`. The 262-line
@@ -198,7 +198,7 @@ does not claim loss numbers, future stress, authentication, optimization, an
 Order, or trading authority.
 
 Candidate trial:
-`/Users/ame/autoquant-v0915-path-stress-candidate`. The exact candidate wheel
+`/Users/ame/2607AutoQuant/grok-field-trials/legacy-root-cleanup/autoquant-v0915-path-stress-candidate`. The exact candidate wheel
 SHA-256 is
 `acbecffeb66c1258ed0dcd448e71dfee7f7545291da041a8f1e48ed887d0e4c1`;
 Python is 3.11.14 and the installed CLI reports `aq 0.9.15`. The 355-line

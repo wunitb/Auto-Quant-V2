@@ -147,9 +147,9 @@ Candidate evidence:
 - wheel SHA-256
   `d86daebb50e921b28ea6654d71664b03822d46a6f4ea746fac865327fb948d1f`;
 - isolated field root
-  `/Users/ame/autoquant-v0921-unevaluable-factor-field`;
+  `/Users/ame/2607AutoQuant/grok-field-trials/legacy-root-cleanup/autoquant-v0921-unevaluable-factor-field`;
 - transcript
-  `/Users/ame/autoquant-v0921-unevaluable-factor-field/grok-transcript.md`;
+  `/Users/ame/2607AutoQuant/grok-field-trials/legacy-root-cleanup/autoquant-v0921-unevaluable-factor-field/grok-transcript.md`;
 - installed Python 3.11.14 and Pandas 3.0.5;
 - focused Factor/Intake regression: 62 tests passed in 243.503 seconds;
 - documentation links: 1,401 resolved at candidate implementation.

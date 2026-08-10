@@ -172,10 +172,10 @@ Baseline trial:
 - Released wheel: exact `auto_quant-0.9.15-py3-none-any.whl`.
 - Fresh reviewer session: `019fbc45-acf9-71d1-ba76-dd7011ebff5f`.
 - Durable loose review:
-  `/Users/ame/autoquant-v0916-review-baseline/independent-review.md` with SHA-256
+  `/Users/ame/2607AutoQuant/grok-field-trials/legacy-root-cleanup/autoquant-v0916-review-baseline/independent-review.md` with SHA-256
   `f19b3d98871b86e10b497700744afc7271ea6e49e3f71dcc3b4a17792a7d3de5`.
 - Transcript:
-  `/Users/ame/autoquant-v0916-review-baseline/baseline-transcript.md`.
+  `/Users/ame/2607AutoQuant/grok-field-trials/legacy-root-cleanup/autoquant-v0916-review-baseline/baseline-transcript.md`.
 - The worker used Python only to parse/hash strict reader output and immutable
   Run metrics; it did not re-price OHLCV or substitute ad hoc quantitative
   authority.
@@ -189,7 +189,7 @@ Candidate trial:
   SHA-256 `84629d5b045352dead4dd4d8487192c42a6ddb1b8d213b59e1d40d0fb9501587`.
 - Fresh reviewer session: `019fbc63-e49c-7510-be74-a69c6ba18b5c`.
 - Detached Review:
-  `/Users/ame/autoquant-v0916-review-candidate/output/review-20260801T081829692481Z-e779b0ca5dba`.
+  `/Users/ame/2607AutoQuant/grok-field-trials/legacy-root-cleanup/autoquant-v0916-review-candidate/output/review-20260801T081829692481Z-e779b0ca5dba`.
 - Package file SHA-256 values: `analysis.json`
   `b3f3e2d7687a27375bfe4ebebc0471022e278a80fe4394b1edf5a40a0f644a69`,
   `evidence.json`
@@ -201,7 +201,7 @@ Candidate trial:
   and `review.md`
   `cf5e1584a0a97a15f917e850fac58f8b468c59015a4337ef727fc4a79b09b093`.
 - Transcript:
-  `/Users/ame/autoquant-v0916-review-candidate/candidate-transcript.md`,
+  `/Users/ame/2607AutoQuant/grok-field-trials/legacy-root-cleanup/autoquant-v0916-review-candidate/candidate-transcript.md`,
   SHA-256 `05915ce8678cc2324fe46dc20a76e7cee5bad3df7110928c9ee392137ac131d2`.
 - The reviewer used public installed readers and Python only for structural
   parsing, hash checks, contribution reconciliation, and greedy-selection

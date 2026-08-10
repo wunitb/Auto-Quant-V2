@@ -218,7 +218,7 @@ Baseline evidence:
 - release wheel:
   `auto_quant-0.9.17-py3-none-any.whl`, SHA-256
   `0414bd960f1f4c51499ac9c1373d2a8c381ac7a48a8ebfc88ed507be53b7e9b7`;
-- isolated root: `/Users/ame/autoquant-v0918-recovery-baseline`;
+- isolated root: `/Users/ame/2607AutoQuant/grok-field-trials/legacy-root-cleanup/autoquant-v0918-recovery-baseline`;
 - fresh Grok 4.5 session:
   `019fbcce-ff36-7c52-9213-fe3a0f76d478`, exported as
   `baseline-transcript.md` beside the desk;
@@ -243,7 +243,7 @@ First candidate replay evidence:
 
 - wheel: `auto_quant-0.9.18-py3-none-any.whl`, SHA-256
   `bf113ea3b665098c97bc27d254eebb3c7a2dcb76edb0d9ed2ae2a02ebfc972b1`;
-- isolated root: `/Users/ame/autoquant-v0918-recovery-candidate`;
+- isolated root: `/Users/ame/2607AutoQuant/grok-field-trials/legacy-root-cleanup/autoquant-v0918-recovery-candidate`;
 - Grok 4.5 session: `019fbcff-aa60-7f10-94f1-a69897f37ee9`, exported as
   `candidate-transcript.md` beside the desk;
 - authoritative Run: `run-20260801T111139428486Z-14b79eebcaea`; Report:
@@ -268,7 +268,7 @@ Final candidate replay evidence:
 
 - wheel: `auto_quant-0.9.18-py3-none-any.whl`, SHA-256
   `85838bcdc2d85251b1cc1ab0d943426bd6578a6dfd7fa5b8a700aedf6e65bc43`;
-- isolated root: `/Users/ame/autoquant-v0918-recovery-final-candidate`;
+- isolated root: `/Users/ame/2607AutoQuant/grok-field-trials/legacy-root-cleanup/autoquant-v0918-recovery-final-candidate`;
 - fresh Grok 4.5 session: `019fbd14-3acb-7120-b69b-c6d58dd67d23`,
   exported as `final-candidate-transcript.md` beside the desk;
 - the unchanged assignment completed with exactly one new fixed Study
