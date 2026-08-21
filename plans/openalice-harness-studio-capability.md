@@ -78,7 +78,15 @@ between caller arguments and injected authority.
 
 ## Verification
 
-- Pending.
+- Focused Studio/version/documentation suites pass 18 tests, including a real
+  managed subprocess, exact loopback readiness identity, occupied-port
+  failure, browser suppression, malformed authority, conflicts, and unchanged
+  standalone behavior. The complete CLI contract passes all 26 tests.
+- Lock consistency, Python compilation, Studio JavaScript syntax, diff
+  hygiene, and all 1,557 documentation links pass. The complete source
+  regression passes all 460 tests in 1,161.458 seconds. The only warnings are
+  the existing NumPy/Pandas empty-slice diagnostics inside a passing governed
+  RL edge-case test.
 
 ## Progress log
 
@@ -90,6 +98,8 @@ between caller arguments and injected authority.
 - 2026-08-21 — The complete 26-test CLI contract passes unchanged. Advanced
   package, lock, Harness manifest, README pointer, STATUS, and CHANGELOG to the
   `0.9.32` release candidate; final release verification remains.
+- 2026-08-21 — The final source audit passes all 460 tests. Build/install,
+  clean-clone, and installed managed-launch replay remain before publication.
 
 ## Completion
 

@@ -44,9 +44,11 @@ clean-commit candidate Runs proving current Factor and Portfolio projections
 under the separated authorities. It now contains nineteen immutable Runs and
 no governed-RL baseline. OpenAlice remains independently pinned to `v0.8.31`.
 
-The final complete regression, build/install, clean-clone, and installed
-managed-Studio replay are pending the release audit. Focused Studio, version,
-CLI, and documentation suites pass; exact proof accumulates in
+The complete source regression passes all 460 tests in 1,161.458 seconds.
+Lock consistency, Python compilation, Studio JavaScript syntax, diff hygiene,
+and all 1,557 current documentation links also pass. Build/install,
+clean-clone, and installed managed-Studio replay remain the last release audit
+step; exact proof accumulates in
 [[plans/openalice-harness-studio-capability]].
 
 ## What works today
