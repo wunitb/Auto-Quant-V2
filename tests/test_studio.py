@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import os
 import shlex
+import socket
 import subprocess
 import sys
 import tempfile
@@ -9,6 +11,7 @@ import threading
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -16,7 +19,11 @@ from autoquant.research import run_campaign
 from autoquant.runs import harness_identity
 from autoquant.sessions import evaluate_experiment, start_session
 from autoquant.studies import create_study, hash_json
-from autoquant.studio import build_studio_snapshot, create_studio_server
+from autoquant.studio import (
+    build_studio_snapshot,
+    create_studio_server,
+    resolve_studio_launch,
+)
 from autoquant.version import current_version
 from autoquant.workspace import (
     AutoQuantValidationError,
@@ -59,6 +66,18 @@ class StudioObservationTests(unittest.TestCase):
         path = Path(directory) / "studio-researcher.py"
         path.write_text(source, encoding="utf-8")
         return f"{shlex.quote(sys.executable)} {shlex.quote(str(path))}"
+
+    def _managed_environment(self, port: int) -> dict[str, str]:
+        environment = os.environ.copy()
+        environment.update(
+            {
+                "OPENALICE_CAPABILITY": "studio",
+                "OPENALICE_CAPABILITY_HOST": "127.0.0.1",
+                "OPENALICE_CAPABILITY_PORTS": json.dumps({"http": port}),
+                "OPENALICE_CAPABILITY_NO_OPEN": "1",
+            }
+        )
+        return environment
 
     def test_workspace_and_project_snapshots_share_verified_contract(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -644,6 +663,204 @@ class StudioObservationTests(unittest.TestCase):
             manifest_path.write_text(json.dumps(manifest))
             with self.assertRaisesRegex(AutoQuantValidationError, "Unknown field"):
                 build_studio_snapshot(workspace.root_dir)
+
+    def test_managed_launch_strictly_resolves_injected_authority(self) -> None:
+        environment = self._managed_environment(49321)
+        launch = resolve_studio_launch(
+            host=None,
+            port=None,
+            no_open=False,
+            environ=environment,
+        )
+
+        self.assertTrue(launch.managed)
+        self.assertEqual(launch.host, "127.0.0.1")
+        self.assertEqual(launch.port, 49321)
+        self.assertFalse(launch.open_browser)
+        self.assertEqual(
+            resolve_studio_launch(
+                host="127.0.0.1",
+                port=49321,
+                no_open=True,
+                environ=environment,
+            ),
+            launch,
+        )
+
+        with self.assertRaisesRegex(AutoQuantValidationError, "conflicts"):
+            resolve_studio_launch(
+                host="localhost",
+                port=None,
+                no_open=True,
+                environ=environment,
+            )
+        with self.assertRaisesRegex(AutoQuantValidationError, "conflicts"):
+            resolve_studio_launch(
+                host=None,
+                port=49322,
+                no_open=True,
+                environ=environment,
+            )
+
+    def test_managed_launch_fails_closed_for_invalid_port_authority(self) -> None:
+        invalid_ports = (
+            None,
+            "not-json",
+            "[]",
+            "{}",
+            '{"http":49321,"http":49322}',
+            '{"http":true}',
+            '{"http":49321.0}',
+            '{"http":"49321"}',
+            '{"http":0}',
+            '{"http":65536}',
+        )
+        for raw in invalid_ports:
+            with self.subTest(raw=raw):
+                environment = {
+                    "OPENALICE_CAPABILITY": "studio",
+                    "OPENALICE_CAPABILITY_HOST": "127.0.0.1",
+                    "OPENALICE_CAPABILITY_NO_OPEN": "1",
+                }
+                if raw is not None:
+                    environment["OPENALICE_CAPABILITY_PORTS"] = raw
+                with self.assertRaises(AutoQuantValidationError):
+                    resolve_studio_launch(
+                        host=None,
+                        port=None,
+                        no_open=False,
+                        environ=environment,
+                    )
+
+        with self.assertRaisesRegex(AutoQuantValidationError, "host"):
+            resolve_studio_launch(
+                host=None,
+                port=None,
+                no_open=False,
+                environ={
+                    "OPENALICE_CAPABILITY": "studio",
+                    "OPENALICE_CAPABILITY_PORTS": '{"http":49321}',
+                },
+            )
+
+    def test_non_managed_environment_preserves_standalone_launch(self) -> None:
+        noisy_environment = {
+            "OPENALICE_CAPABILITY": "another-capability",
+            "OPENALICE_CAPABILITY_HOST": "192.0.2.1",
+            "OPENALICE_CAPABILITY_PORTS": "not-json",
+            "OPENALICE_CAPABILITY_NO_OPEN": "1",
+        }
+        default = resolve_studio_launch(
+            host=None,
+            port=None,
+            no_open=False,
+            environ=noisy_environment,
+        )
+        explicit = resolve_studio_launch(
+            host="localhost",
+            port=0,
+            no_open=True,
+            environ=noisy_environment,
+        )
+
+        self.assertFalse(default.managed)
+        self.assertEqual(default.host, "127.0.0.1")
+        self.assertEqual(default.port, 8765)
+        self.assertTrue(default.open_browser)
+        self.assertEqual(explicit.host, "localhost")
+        self.assertEqual(explicit.port, 0)
+        self.assertFalse(explicit.open_browser)
+
+    def test_managed_cli_forces_no_browser_and_exact_bind(self) -> None:
+        from autoquant.cli import main
+
+        environment = self._managed_environment(49321)
+        with mock.patch.dict(os.environ, environment, clear=True), mock.patch(
+            "autoquant.cli.serve_studio"
+        ) as serve:
+            exit_code = main(["studio", "serve", "."])
+
+        self.assertEqual(exit_code, 0)
+        serve.assert_called_once_with(
+            ".",
+            project_id=None,
+            host="127.0.0.1",
+            port=49321,
+            open_browser=False,
+        )
+
+    def test_managed_cli_uses_real_fixed_port_and_health_readiness(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace, _, _ = self._setup(directory)
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+                probe.bind(("127.0.0.1", 0))
+                port = probe.getsockname()[1]
+            process = subprocess.Popen(
+                [
+                    sys.executable,
+                    "-m",
+                    "autoquant",
+                    "studio",
+                    "serve",
+                    str(workspace.root_dir),
+                    "--no-open",
+                ],
+                cwd=Path(__file__).resolve().parents[1],
+                env=self._managed_environment(port),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            try:
+                announcement = process.stdout.readline().strip()
+                self.assertEqual(
+                    announcement,
+                    f"AutoQuant Studio: http://127.0.0.1:{port}",
+                    process.stderr.read() if process.poll() is not None else "",
+                )
+                with urlopen(
+                    f"http://127.0.0.1:{port}/api/v1/health",
+                    timeout=3,
+                ) as response:
+                    self.assertEqual(response.status, 200)
+                    health = json.loads(response.read())
+                self.assertTrue(health["ok"])
+                self.assertEqual(health["service"], "autoquant-studio")
+                self.assertEqual(health["mode"], "read-only")
+            finally:
+                process.terminate()
+                process.wait(timeout=5)
+                process.stdout.close()
+                process.stderr.close()
+
+    def test_managed_cli_fails_when_injected_port_is_occupied(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace, _, _ = self._setup(directory)
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as occupied:
+                occupied.bind(("127.0.0.1", 0))
+                occupied.listen()
+                port = occupied.getsockname()[1]
+                result = subprocess.run(
+                    [
+                        sys.executable,
+                        "-m",
+                        "autoquant",
+                        "studio",
+                        "serve",
+                        str(workspace.root_dir),
+                        "--no-open",
+                    ],
+                    cwd=Path(__file__).resolve().parents[1],
+                    env=self._managed_environment(port),
+                    capture_output=True,
+                    check=False,
+                    text=True,
+                    timeout=5,
+                )
+
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.stdout, "")
+        self.assertIn("Address already in use", result.stderr)
 
     def test_cli_serve_announces_a_live_local_read_only_url(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

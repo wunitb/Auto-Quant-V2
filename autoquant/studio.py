@@ -3,15 +3,17 @@
 from __future__ import annotations
 
 import json
+import os
 import shlex
 import threading
 import webbrowser
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from importlib.resources import files
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Mapping
 from urllib.parse import urlsplit
 
 from .allocation_explorer import (
@@ -67,6 +69,24 @@ from .workspace import (
 
 
 STUDIO_KIND = "autoquant-studio-snapshot"
+OPENALICE_CAPABILITY = "OPENALICE_CAPABILITY"
+OPENALICE_CAPABILITY_HOST = "OPENALICE_CAPABILITY_HOST"
+OPENALICE_CAPABILITY_PORTS = "OPENALICE_CAPABILITY_PORTS"
+OPENALICE_CAPABILITY_NO_OPEN = "OPENALICE_CAPABILITY_NO_OPEN"
+STANDALONE_STUDIO_HOST = "127.0.0.1"
+STANDALONE_STUDIO_PORT = 8765
+
+
+@dataclass(frozen=True)
+class StudioLaunch:
+    """Resolved bind and browser authority for one Studio process."""
+
+    host: str
+    port: int
+    open_browser: bool
+    managed: bool
+
+
 STUDIO_ASSETS = {
     "/": ("index.html", "text/html; charset=utf-8"),
     "/index.html": ("index.html", "text/html; charset=utf-8"),
@@ -91,6 +111,140 @@ SECURITY_HEADERS = {
 
 def _issue(path: Path | str, code: str, message: str) -> ValidationIssue:
     return ValidationIssue(str(path), code, message)
+
+
+def _managed_ports(raw: str | None) -> dict[str, Any]:
+    if raw is None:
+        raise AutoQuantValidationError(
+            [
+                _issue(
+                    OPENALICE_CAPABILITY_PORTS,
+                    "studio.managed-ports",
+                    "Managed Studio requires an injected JSON ports object",
+                )
+            ]
+        )
+
+    def reject_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f"duplicate port name: {key}")
+            result[key] = value
+        return result
+
+    try:
+        parsed = json.loads(raw, object_pairs_hook=reject_duplicates)
+    except (json.JSONDecodeError, ValueError) as error:
+        raise AutoQuantValidationError(
+            [
+                _issue(
+                    OPENALICE_CAPABILITY_PORTS,
+                    "studio.managed-ports",
+                    "Managed Studio ports must be one unambiguous JSON object",
+                )
+            ]
+        ) from error
+    if not isinstance(parsed, dict):
+        raise AutoQuantValidationError(
+            [
+                _issue(
+                    OPENALICE_CAPABILITY_PORTS,
+                    "studio.managed-ports",
+                    "Managed Studio ports must be a JSON object",
+                )
+            ]
+        )
+    return parsed
+
+
+def resolve_studio_launch(
+    *,
+    host: str | None,
+    port: int | None,
+    no_open: bool,
+    environ: Mapping[str, str] | None = None,
+) -> StudioLaunch:
+    """Resolve standalone defaults or strict OpenAlice Studio authority."""
+
+    environment = os.environ if environ is None else environ
+    if environment.get(OPENALICE_CAPABILITY) != "studio":
+        return StudioLaunch(
+            host=STANDALONE_STUDIO_HOST if host is None else host,
+            port=STANDALONE_STUDIO_PORT if port is None else port,
+            open_browser=not no_open,
+            managed=False,
+        )
+
+    injected_host = environment.get(OPENALICE_CAPABILITY_HOST)
+    if (
+        injected_host is None
+        or not injected_host
+        or injected_host.strip() != injected_host
+    ):
+        raise AutoQuantValidationError(
+            [
+                _issue(
+                    OPENALICE_CAPABILITY_HOST,
+                    "studio.managed-host",
+                    "Managed Studio requires one non-empty injected host",
+                )
+            ]
+        )
+    ports = _managed_ports(environment.get(OPENALICE_CAPABILITY_PORTS))
+    if "http" not in ports:
+        raise AutoQuantValidationError(
+            [
+                _issue(
+                    f"{OPENALICE_CAPABILITY_PORTS}.http",
+                    "studio.managed-http-port",
+                    "Managed Studio ports must include http",
+                )
+            ]
+        )
+    injected_port = ports["http"]
+    if (
+        not isinstance(injected_port, int)
+        or isinstance(injected_port, bool)
+        or not 1 <= injected_port <= 65535
+    ):
+        raise AutoQuantValidationError(
+            [
+                _issue(
+                    f"{OPENALICE_CAPABILITY_PORTS}.http",
+                    "studio.managed-http-port",
+                    "Managed Studio http port must be an integer from 1 to 65535",
+                )
+            ]
+        )
+    issues: list[ValidationIssue] = []
+    if host is not None and host != injected_host:
+        issues.append(
+            _issue(
+                "--host",
+                "studio.managed-host-conflict",
+                f"Explicit Studio host {host!r} conflicts with injected host {injected_host!r}",
+            )
+        )
+    if port is not None and port != injected_port:
+        issues.append(
+            _issue(
+                "--port",
+                "studio.managed-port-conflict",
+                f"Explicit Studio port {port} conflicts with injected port {injected_port}",
+            )
+        )
+    if issues:
+        raise AutoQuantValidationError(issues)
+    return StudioLaunch(
+        host=injected_host,
+        port=injected_port,
+        open_browser=(
+            not no_open
+            and environment.get(OPENALICE_CAPABILITY_NO_OPEN) != "1"
+        ),
+        managed=True,
+    )
 
 
 def _diagnostics(

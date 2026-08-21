@@ -36,6 +36,30 @@ class VersionContractTests(unittest.TestCase):
         self.assertEqual(match.group(1), package_version)
         self.assertEqual(current_version(), package_version)
         self.assertEqual(harness_identity()["version"], package_version)
+        harness_manifest = json.loads(
+            (PROJECT_DIR / "harness.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            harness_manifest,
+            {
+                "manifestVersion": 1,
+                "version": package_version,
+                "capabilities": {
+                    "studio": {
+                        "command": [
+                            "aq",
+                            "studio",
+                            "serve",
+                            ".",
+                            "--no-open",
+                        ],
+                        "ports": ["http"],
+                        "entryPort": "http",
+                        "readinessPath": "/api/v1/health",
+                    }
+                },
+            },
+        )
 
         cli = subprocess.run(
             [sys.executable, "-m", "autoquant", "--version"],

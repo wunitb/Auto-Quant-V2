@@ -186,7 +186,12 @@ from .research_program import (
     RESEARCH_DESK_TEMPLATE,
     load_research_program,
 )
-from .studio import STUDIO_SNAPSHOT_JSON_SCHEMA, build_studio_snapshot, serve_studio
+from .studio import (
+    STUDIO_SNAPSHOT_JSON_SCHEMA,
+    build_studio_snapshot,
+    resolve_studio_launch,
+    serve_studio,
+)
 from .templates import (
     PROJECT_TEMPLATE_IDS,
     TEMPLATE_STUDY_IDS,
@@ -1369,8 +1374,8 @@ def build_parser() -> RaisingArgumentParser:
     )
     studio_serve.add_argument("path")
     studio_serve.add_argument("--project")
-    studio_serve.add_argument("--host", default="127.0.0.1")
-    studio_serve.add_argument("--port", type=int, default=8765)
+    studio_serve.add_argument("--host")
+    studio_serve.add_argument("--port", type=int)
     studio_serve.add_argument("--no-open", action="store_true")
     studio_serve.set_defaults(command_id="studio.serve")
     return parser
@@ -5472,12 +5477,17 @@ def _studio_snapshot(args: argparse.Namespace) -> CommandResult:
 
 
 def _studio_serve(args: argparse.Namespace) -> CommandResult:
+    launch = resolve_studio_launch(
+        host=args.host,
+        port=args.port,
+        no_open=args.no_open,
+    )
     serve_studio(
         args.path,
         project_id=args.project,
-        host=args.host,
-        port=args.port,
-        open_browser=not args.no_open,
+        host=launch.host,
+        port=launch.port,
+        open_browser=launch.open_browser,
     )
     return CommandResult(
         "studio.serve",
