@@ -42,6 +42,12 @@ evaluation semantics, Studio, and evidence remain the same. A host may add
 identity, scheduling, communication, credentials, and shared tools around the
 Workspace, but AutoQuant Core does not branch on an OpenAlice mode.
 
+The repository may expose narrow host discovery and process-launch metadata.
+For example, `harness.json` declares the existing Studio command, while an
+exact capability marker lets that command consume a host-assigned bind port.
+This is launch authority around the same Studio server, not a hosted research
+Core, private API, or second product edition.
+
 The product model is no longer supported only by reference fixtures.
 AutoQuant `0.8.8` has completed materially different real-request field trials
 covering Factor, Portfolio, governed RL, multi-interval Crypto, mixed-class
@@ -245,6 +251,7 @@ portfolio decisions, or filesystem authority.
 - creating or discovering Workspace desks;
 - starting and resuming native Agent Sessions;
 - cross-Workspace task assignment and communication;
+- capability discovery, loopback port allocation, and process supervision;
 - host-authenticated provenance, scheduling, Inbox, and shared tool injection.
 
 OpenAlice is the first-party example. AutoQuant does not require those services

@@ -22,6 +22,7 @@ The shipped repository now materializes that model directly:
 
 ```text
 Auto-Quant-V2/                     # Workspace root and Git history
+├── harness.json                   # optional host capability discovery
 ├── autoquant-workspace.json       # checked-in discovery/default
 ├── autoquant/                     # Harness runtime, schemas, CLI, Studio
 ├── projects/
@@ -128,6 +129,9 @@ The V2 foundation now implements:
   explicit mutable Campaign progress, defensive HTTP boundary, bounded
   verified Portfolio decision exploration, and responsive research-first
   presentation.
+- one repository-root Harness manifest and strict optional Studio launch
+  adapter that consumes a host-assigned named loopback port without changing
+  standalone defaults, HTTP ownership, or quantitative Core behavior;
 - one verified Portfolio sizing-anatomy read model that explains conviction,
   inverse volatility, same-side budget, caps/water-filling, covariance
   governance, historical execution, and component risk without becoming an

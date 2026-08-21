@@ -42,13 +42,13 @@ between caller arguments and injected authority.
 
 ## Acceptance
 
-- [ ] `harness.json` exactly declares the Studio command, named port, entry
+- [x] `harness.json` exactly declares the Studio command, named port, entry
   port, readiness path, manifest protocol, and current product version.
-- [ ] Hosted mode fails closed for missing or malformed port authority and
+- [x] Hosted mode fails closed for missing or malformed port authority and
   binds only the injected host and integer port without probing alternatives.
-- [ ] Explicit conflicting host/port flags fail, no-open authority is obeyed,
+- [x] Explicit conflicting host/port flags fail, no-open authority is obeyed,
   and unrelated or absent capability environments preserve standalone behavior.
-- [ ] A real subprocess launched on a test-assigned loopback port answers a
+- [x] A real subprocess launched on a test-assigned loopback port answers a
   successful health request identifying `autoquant-studio`.
 - [ ] Focused tests, documentation links, complete regression, build/install
   smoke, clean Workspace replay, tag, and canonical push pass for `v0.9.32`.
@@ -57,8 +57,9 @@ between caller arguments and injected authority.
 
 - [x] Audit current manifest/version, CLI argument, HTTP bind, browser, health,
   and standalone contracts.
-- [ ] Implement the manifest and narrow hosted launch resolver with tests.
-- [ ] Update the owning Studio, CLI, operator, status, and release documents.
+- [x] Implement the manifest and narrow hosted launch resolver with tests.
+- [x] Update the owning Studio, CLI, operator, architecture, and product-model
+  documents; current status and release metadata remain for the late bump.
 - [ ] Bump to `0.9.32`, reconcile generated identity, run the release audit,
   publish the annotated tag, and verify remote branch/tag parity.
 
@@ -71,6 +72,9 @@ between caller arguments and injected authority.
 - 2026-08-21 — CLI parser defaults will become unresolved `None` values only
   internally so explicitness survives parsing; public standalone defaults stay
   `127.0.0.1:8765` and capability discovery continues to describe them.
+- 2026-08-21 — Capability activation is exact. Stale or unrelated OpenAlice
+  variables cannot mutate ordinary Studio launch, and no host process metadata
+  enters quantitative Core or the Studio snapshot.
 
 ## Verification
 
@@ -80,6 +84,9 @@ between caller arguments and injected authority.
 
 - 2026-08-21 — Plan activated from clean `main` at `0913ebd`; no OpenAlice
   repository change is in scope.
+- 2026-08-21 — Added the manifest, strict resolver, CLI handoff, fail-closed
+  validation, real-port readiness/occupation tests, and durable hosted launch
+  documentation. The focused version/Studio suite passes 16 tests.
 
 ## Completion
 

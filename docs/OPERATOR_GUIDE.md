@@ -245,6 +245,9 @@ It shows effective Workspace configuration, Projects, requests, Agent work
 briefs, Studies, Sessions, Runs, experiments, evidence explorers, Reports,
 Reviews, Dossiers, diagnostics, and copyable next commands. It does not create
 private orchestration or alternative research truth. See [[docs/STUDIO]].
+OpenAlice may discover this same server through the repository-root
+`harness.json`, assign its loopback port, and probe the existing health route;
+AutoQuant still owns the HTTP process and read model.
 
 ## Where to continue
 

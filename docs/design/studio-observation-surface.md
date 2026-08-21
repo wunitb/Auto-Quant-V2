@@ -15,9 +15,9 @@ Related: [[docs/ARCHITECTURE]], [[docs/CLI]], [[docs/PROJECT_FORMAT]],
 
 ## Scope
 
-This document owns the local Studio snapshot, read-only HTTP boundary,
-presentation responsibilities, and the distinction between immutable evidence
-and mutable execution progress.
+This document owns the Studio snapshot, read-only HTTP boundary, standalone or
+host-assigned launch authority, presentation responsibilities, and the
+distinction between immutable evidence and mutable execution progress.
 
 It does not own research decisions, evaluation, source mutation, promotion,
 remote hosting, authentication, or cloud persistence.
@@ -117,6 +117,30 @@ There is no arbitrary path, artifact download, mutation, command, or shell
 endpoint. Responses set a restrictive Content Security Policy, disable
 sniffing and framing, and avoid cross-origin access. Binding to a non-loopback
 address is an explicit operator choice and V1 has no authentication.
+
+## Harness capability launch
+
+The repository-root `harness.json` is the host discovery surface. Its manifest
+protocol version is distinct from the AutoQuant product version. The one
+declared `studio` capability executes the ordinary `aq studio serve .
+--no-open` command from the Workspace root, requests a named `http` port, and
+uses `/api/v1/health` for readiness. That route returns HTTP 200 only after the
+server is listening and identifies `service: autoquant-studio`.
+
+`OPENALICE_CAPABILITY=studio` alone activates managed launch resolution. In
+that mode, `OPENALICE_CAPABILITY_HOST` is required and
+`OPENALICE_CAPABILITY_PORTS` must be an unambiguous JSON object containing an
+integer `http` value in `1..65535`. AutoQuant binds exactly that host and port.
+It never probes or increments another port. An explicitly supplied `--host` or
+`--port` may repeat injected authority but cannot conflict with it. Port bind
+failure remains a process startup failure. `OPENALICE_CAPABILITY_NO_OPEN=1`
+forces browser suppression.
+
+When the capability value is absent or anything other than `studio`, every
+OpenAlice capability variable is irrelevant to Studio. The standalone command
+retains `127.0.0.1:8765`, explicit `--host`/`--port`, port `0` OS allocation,
+and ordinary browser behavior. This narrow launch adapter changes no snapshot,
+HTTP, research, or evidence semantics and requires no OpenAlice SDK.
 
 ## Presentation priorities
 
@@ -256,6 +280,8 @@ the overall delivery state back to a single-lane Report.
     combine one lane's explorer with another lane's Report.
 12. Studio projects executed-book risk only from Core-reconciled immutable
     rows and never treats a risk override as trading permission.
+13. Managed launch consumes one exact host-assigned port or fails; standalone
+    launch is unaffected unless the Studio capability marker is exact.
 
 ## Known gaps
 

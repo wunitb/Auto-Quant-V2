@@ -38,6 +38,34 @@ probes Git or package metadata independently. See
 The default bind is intentionally loopback-only. V1 has no authentication.
 Binding `--host` to a non-loopback address is an explicit operator decision.
 
+## OpenAlice-managed launch
+
+The repository-root `harness.json` lets a compatible Harness discover Studio
+without an AutoQuant-specific SDK. OpenAlice executes the same public command
+from the Workspace root and injects one named loopback port. A reproducible
+managed launch is:
+
+```bash
+OPENALICE_CAPABILITY=studio \
+OPENALICE_CAPABILITY_HOST=127.0.0.1 \
+OPENALICE_CAPABILITY_PORTS='{"http":49321}' \
+OPENALICE_CAPABILITY_NO_OPEN=1 \
+aq studio serve . --no-open
+```
+
+After the URL announcement, readiness is:
+
+```bash
+curl --fail http://127.0.0.1:49321/api/v1/health
+```
+
+Managed mode binds exactly the injected host and `http` port. Missing,
+malformed, non-integer, boolean, zero, or out-of-range port authority fails
+before listening. An occupied port also fails; AutoQuant never selects a
+replacement. Explicit `--host` or `--port` values must equal their injected
+values. Outside exact `OPENALICE_CAPABILITY=studio` mode, these environment
+variables do not affect standalone behavior.
+
 ## What the page shows
 
 The first viewport prioritizes:

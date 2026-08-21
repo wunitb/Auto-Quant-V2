@@ -1334,7 +1334,16 @@ publish, run, or show command.
 packaged read-only browser presentation and the same snapshot contract. It
 does not support `--json` because its stdout announces a live URL rather than
 one terminal envelope. Loopback is the default; non-loopback binding is an
-explicit operator choice and V1 has no authentication. See [[docs/STUDIO]].
+explicit operator choice and V1 has no authentication.
+
+When `OPENALICE_CAPABILITY=studio`, the command enters strict Harness-managed
+launch. It requires `OPENALICE_CAPABILITY_HOST` and JSON
+`OPENALICE_CAPABILITY_PORTS` with one integer `http` port in `1..65535`, binds
+that exact endpoint, and fails instead of finding another port. Conflicting
+explicit `--host`/`--port` values are invalid, while equal repetitions are
+allowed. `OPENALICE_CAPABILITY_NO_OPEN=1` forces no-browser operation. Other
+capability values do not alter standalone defaults or flags. See
+[[docs/STUDIO]].
 
 ## Success envelope
 
