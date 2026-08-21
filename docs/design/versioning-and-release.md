@@ -23,6 +23,8 @@ One release version must agree across:
 
 - `pyproject.toml` package metadata;
 - `uv.lock` lock metadata;
+- repository-root `harness.json` product version (its independent
+  `manifestVersion` belongs to the host capability protocol);
 - `autoquant/version.py` runtime reporting of installed package metadata (it
   has no separately edited version literal);
 - `hatch_build.py` embedded commit/dirty provenance for built distributions;

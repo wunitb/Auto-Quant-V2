@@ -1,10 +1,10 @@
 # AutoQuant V2 current status
 
-Status: `v0.9.31` is the current AutoQuant release and `v0.8.31`
+Status: `v0.9.32` is the current AutoQuant release and `v0.8.31`
 remains the Harness currently consumed by OpenAlice until the host deliberately
 selects a newer tag.
 
-Updated: 2026-08-02.
+Updated: 2026-08-21.
 
 Related: [[README]], [[docs/CHANGELOG]], [[docs/ARCHITECTURE]],
 [[docs/design/agent-native-quant-workbench]],
@@ -17,52 +17,37 @@ historical proof remains in completed plans and immutable Git tags.
 
 ## Current milestone
 
-The `0.9.31` release makes the transition from verified Factor evidence to an
-Agent-authored immutable Report explicit. Factor diagnostics now project one
-strict `quantileEvidence` contract. Cross-sectional Runs declare fixed
-tertiles available; single-asset temporal and two-asset relative-value Runs
-declare `protocol-unavailable`, the immutable method and reason, and zero
-artifact rows. CLI states that boundary and Studio disables the inapplicable
-Quantiles tab instead of presenting null groups as missing or failed science.
+The `0.9.32` release exposes the existing read-only Studio through the standard
+repository-root Harness capability manifest. A host discovers one `studio`
+command, allocates its named `http` port, starts the ordinary public CLI from
+the Workspace root, and waits on the existing `/api/v1/health` route. No
+OpenAlice SDK, private process protocol, alternate Server, or UI path exists.
 
-The shared Agent Work Brief now exposes a nullable, visibility-only primary
-train/validation mean rank-IC contrast when the absolute gap reaches the fixed
-`0.20` threshold. It identifies the exact Run, horizon, values, and gap across
-JSON, terminal, and Studio while retaining validation as the sole selection
-split. The field is not a gate, verdict, qualification rule, or route for test
-evidence into selection.
+Exact `OPENALICE_CAPABILITY=studio` mode now requires a non-empty injected
+host and an unambiguous JSON ports object with integer `http` in `1..65535`.
+Studio binds only that endpoint. Missing or malformed authority, explicit
+host/port conflicts, and occupied ports fail the process instead of silently
+falling back. Host no-open authority suppresses the browser. Without that exact
+capability marker, OpenAlice variables are ignored and standalone Studio keeps
+its `127.0.0.1:8765`, explicit flag, browser, and port-zero behavior.
 
-New `aq report draft` verifies one exact Session or direct-Run anchor and
-creates a confined, non-overwriting, schema-valid Project-local analysis
-scaffold with the leader Run and every declared artifact reference prefilled.
-It writes no conclusion. `authoringState: draft` and a reserved finding make
-the scaffold deliberately unpublishable until the Agent replaces the prose
-and sets it to final. Historical analyses without the optional authoring field
-remain readable.
-
-Fresh no-memory/no-web/no-subagent Grok `4.5` used only the clean installed
-candidate wheel and public surfaces to repeat a single-target NVDA forward-
-risk assignment. Without command coaching it discovered the draft route,
-interpreted temporal quantiles as protocol-unavailable, used the Work Brief's
-train IC `-0.1072916034` versus validation IC `0.1744431644` contrast, and
-published an honest weak-result Report. It completed with one Run, zero
-Experiments, one Report, no Portfolio/RL work, no Portfolio Mandate, and no
-new framework need. Exact proof is retained in
-[[plans/factor-evidence-report-handoff]].
+The health response remains AutoQuant-owned read-only HTTP and identifies
+`service: autoquant-studio` after listening. Focused tests launch a real
+subprocess on a test-assigned loopback port, probe readiness, hold an injected
+port occupied, verify browser suppression through the CLI boundary, and cover
+invalid JSON, missing `http`, booleans, non-integers, bounds, duplicate keys,
+and argument conflicts. Exact release proof accumulates in
+[[plans/openalice-harness-studio-capability]].
 
 The root sample preserves all seventeen prior Runs byte-for-byte and adds two
 clean-commit candidate Runs proving current Factor and Portfolio projections
 under the separated authorities. It now contains nineteen immutable Runs and
 no governed-RL baseline. OpenAlice remains independently pinned to `v0.8.31`.
 
-The final source regression passes all 454 tests in 1,215.222 seconds. Lock
-consistency, Python compilation, Studio JavaScript syntax, diff hygiene, and
-all 1,552 current documentation links also pass. A clean candidate wheel
-reports exact embedded build provenance, all 59 commands, all nine Project
-routes, all 16 bundled Skills, Studio assets, and the changed
-Report/Factor/Work-Brief schemas. Its no-override clone replay and newly
-executed Factor Run agree with the installed seven-field Harness identity.
-Exact proof is retained in [[plans/factor-evidence-report-handoff]].
+The final complete regression, build/install, clean-clone, and installed
+managed-Studio replay are pending the release audit. Focused Studio, version,
+CLI, and documentation suites pass; exact proof accumulates in
+[[plans/openalice-harness-studio-capability]].
 
 ## What works today
 

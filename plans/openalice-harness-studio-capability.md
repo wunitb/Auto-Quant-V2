@@ -87,6 +87,9 @@ between caller arguments and injected authority.
 - 2026-08-21 — Added the manifest, strict resolver, CLI handoff, fail-closed
   validation, real-port readiness/occupation tests, and durable hosted launch
   documentation. The focused version/Studio suite passes 16 tests.
+- 2026-08-21 — The complete 26-test CLI contract passes unchanged. Advanced
+  package, lock, Harness manifest, README pointer, STATUS, and CHANGELOG to the
+  `0.9.32` release candidate; final release verification remains.
 
 ## Completion
 
