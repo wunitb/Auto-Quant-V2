@@ -18,13 +18,13 @@ invariants live in `docs/design/`.
 
 ## Active plans
 
-| Plan | Outcome | Updated |
-| --- | --- | --- |
-| [[plans/openalice-harness-studio-capability]] | Let OpenAlice discover and launch the existing Studio on one host-assigned fixed loopback port without changing standalone operation. | 2026-08-21 |
+None.
 
 ## Proposed plans
 
-None.
+| Plan | Outcome | Updated |
+| --- | --- | --- |
+| [[plans/tiered-test-feedback]] | Provide sub-minute first feedback while retaining explicit integration and complete scientific release gates. | 2026-08-21 |
 
 ## Paused plans
 
@@ -36,6 +36,7 @@ None.
 
 | Plan | Outcome | Updated |
 | --- | --- | --- |
+| [[plans/openalice-harness-studio-capability]] | Let OpenAlice discover and launch the existing Studio on one host-assigned fixed loopback port without changing standalone operation. | 2026-08-21 |
 | [[plans/factor-evidence-report-handoff]] | Made temporal Factor protocol applicability, material train/validation tension, and safe evidence-bound Report drafting explicit to fresh Agents. | 2026-08-02 |
 | [[plans/caller-owned-factor-population]] | Separated caller-owned Factor evaluation population from Portfolio position authority across standalone Factor, Portfolio, and governed-RL research. | 2026-08-02 |
 | [[plans/concise-documentation-front-door]] | Make README a bounded product entrance and route Agents to one operator guide plus the existing authoritative release documents. | 2026-08-02 |

@@ -1,6 +1,6 @@
 # OpenAlice Harness Studio capability
 
-- Status: `active`
+- Status: `completed`
 - Target release: `0.9.32`
 - Updated: `2026-08-21`
 - Related design: [[docs/design/studio-observation-surface]],
@@ -50,7 +50,7 @@ between caller arguments and injected authority.
   and unrelated or absent capability environments preserve standalone behavior.
 - [x] A real subprocess launched on a test-assigned loopback port answers a
   successful health request identifying `autoquant-studio`.
-- [ ] Focused tests, documentation links, complete regression, build/install
+- [x] Focused tests, documentation links, complete regression, build/install
   smoke, clean Workspace replay, tag, and canonical push pass for `v0.9.32`.
 
 ## Work
@@ -59,8 +59,8 @@ between caller arguments and injected authority.
   and standalone contracts.
 - [x] Implement the manifest and narrow hosted launch resolver with tests.
 - [x] Update the owning Studio, CLI, operator, architecture, and product-model
-  documents; current status and release metadata remain for the late bump.
-- [ ] Bump to `0.9.32`, reconcile generated identity, run the release audit,
+  documents, then update current status and release metadata in the late bump.
+- [x] Bump to `0.9.32`, reconcile generated identity, run the release audit,
   publish the annotated tag, and verify remote branch/tag parity.
 
 ## Findings and decisions
@@ -83,10 +83,26 @@ between caller arguments and injected authority.
   failure, browser suppression, malformed authority, conflicts, and unchanged
   standalone behavior. The complete CLI contract passes all 26 tests.
 - Lock consistency, Python compilation, Studio JavaScript syntax, diff
-  hygiene, and all 1,557 documentation links pass. The complete source
+  hygiene, and all 1,562 final documentation links pass. The complete source
   regression passes all 460 tests in 1,161.458 seconds. The only warnings are
   the existing NumPy/Pandas empty-slice diagnostics inside a passing governed
   RL edge-case test.
+- Clean candidate commit `7d14046` built wheel SHA-256
+  `c952e076080fde812daf4a4e6b20e979bee4db7a90b4e8236943a7a0ab906124`
+  and sdist SHA-256
+  `cfb03b7cf6ad2ee02246656745807229bc567f5121e1c2b31cd001b20237e8db`.
+  A fresh Python `3.11.14` environment reports version `0.9.32`, clean
+  embedded commit `7d140462ed4305039076d1c29d8a35431cd0d184`, source hash
+  `815bcdf2d74888f90b21f5cf8156c7ed65dbee7650d0dc6003a165ae4834b651`,
+  all 59 commands, all 16 Skills, all 39 Project template files, and packaged
+  Studio assets.
+- A no-hardlink clean clone has no local override, selects the sample Project,
+  and passes installed-wheel orientation, validation, Project listing, and
+  Studio snapshot identity. The exact manifest command started on injected
+  port `56695`; health returned HTTP 200 with `service:
+  autoquant-studio`. An occupied injected port `56699` and explicit conflict
+  both exited 1, while standalone port-zero launch ignored unrelated OpenAlice
+  environment noise.
 
 ## Progress log
 
@@ -100,7 +116,16 @@ between caller arguments and injected authority.
   `0.9.32` release candidate; final release verification remains.
 - 2026-08-21 — The final source audit passes all 460 tests. Build/install,
   clean-clone, and installed managed-launch replay remain before publication.
+- 2026-08-21 — Clean build/install, package closure, no-override clone, exact
+  managed launch/readiness, occupied-port, conflict, and standalone-isolation
+  replay pass. The separate test-latency issue is recorded in
+  [[plans/tiered-test-feedback]] rather than expanding this release.
 
 ## Completion
 
-Pending.
+Completed on 2026-08-21. AutoQuant now exposes its existing Studio through one
+standard repository Harness capability and consumes exact host-assigned launch
+authority only under the explicit Studio marker. Standalone behavior, HTTP
+ownership, UI, quantitative Core, and research evidence remain unchanged. All
+focused, complete-source, build/install, package, clone, readiness, strict-port,
+and publication audits pass for `v0.9.32`.

@@ -46,9 +46,9 @@ no governed-RL baseline. OpenAlice remains independently pinned to `v0.8.31`.
 
 The complete source regression passes all 460 tests in 1,161.458 seconds.
 Lock consistency, Python compilation, Studio JavaScript syntax, diff hygiene,
-and all 1,557 current documentation links also pass. Build/install,
-clean-clone, and installed managed-Studio replay remain the last release audit
-step; exact proof accumulates in
+and all 1,562 current documentation links also pass. Clean build/install,
+package closure, no-override clone, exact managed-Studio health, occupied-port,
+argument-conflict, and standalone-isolation replays pass; exact proof is in
 [[plans/openalice-harness-studio-capability]].
 
 ## What works today
@@ -162,4 +162,5 @@ AutoQuant evidence without moving live-trading authority into the quant desk.
 Continue driving `0.9.x` from bounded real assignments and Project-local
 `framework-needs.md`. Prefer correctness and Agent operability over speculative
 surface or pre-1.0 compatibility; [[PLANS]] owns the next active item when one
-is selected.
+is selected. The proposed [[plans/tiered-test-feedback]] separates fast
+development feedback from unchanged complete scientific release protection.
