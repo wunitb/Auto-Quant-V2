@@ -1,0 +1,86 @@
+# OpenAlice Harness Studio capability
+
+- Status: `active`
+- Target release: `0.9.32`
+- Updated: `2026-08-21`
+- Related design: [[docs/design/studio-observation-surface]],
+  [[docs/design/agent-native-quant-workbench]], and
+  [[docs/design/versioning-and-release]].
+
+## Outcome
+
+Let OpenAlice discover and launch the existing AutoQuant Studio through the
+standard Harness capability manifest while preserving the unchanged standalone
+Studio command and keeping HTTP ownership and lifecycle inside AutoQuant.
+
+## Context
+
+Studio already owns a loopback HTTP server, a successful
+`/api/v1/health` identity response, browser suppression, and exact local bind
+arguments. OpenAlice now needs one repository-root declaration and a strict
+host-assigned port path. The current CLI parser erases whether `--host` or
+`--port` was explicitly supplied, so it cannot yet reject only real conflicts
+between caller arguments and injected authority.
+
+## Scope
+
+### In scope
+
+- Add strict repository-root `harness.json` manifest version 1 with one Studio
+  capability and the canonical AutoQuant product version.
+- Activate hosted resolution only for `OPENALICE_CAPABILITY=studio`; strictly
+  validate the injected host and named `http` port, reject conflicting explicit
+  CLI arguments, and force no-browser behavior when requested.
+- Preserve standalone defaults, explicit flags, and port-zero test allocation.
+- Prove exact fixed-port binding, occupied-port failure, browser suppression,
+  health readiness, version parity, and non-hosted environment isolation.
+
+### Out of scope
+
+- OpenAlice SDKs, generic capability/plugin/process abstractions, process graph
+  ownership, Studio UI changes, remote serving, or host-side implementation.
+
+## Acceptance
+
+- [ ] `harness.json` exactly declares the Studio command, named port, entry
+  port, readiness path, manifest protocol, and current product version.
+- [ ] Hosted mode fails closed for missing or malformed port authority and
+  binds only the injected host and integer port without probing alternatives.
+- [ ] Explicit conflicting host/port flags fail, no-open authority is obeyed,
+  and unrelated or absent capability environments preserve standalone behavior.
+- [ ] A real subprocess launched on a test-assigned loopback port answers a
+  successful health request identifying `autoquant-studio`.
+- [ ] Focused tests, documentation links, complete regression, build/install
+  smoke, clean Workspace replay, tag, and canonical push pass for `v0.9.32`.
+
+## Work
+
+- [x] Audit current manifest/version, CLI argument, HTTP bind, browser, health,
+  and standalone contracts.
+- [ ] Implement the manifest and narrow hosted launch resolver with tests.
+- [ ] Update the owning Studio, CLI, operator, status, and release documents.
+- [ ] Bump to `0.9.32`, reconcile generated identity, run the release audit,
+  publish the annotated tag, and verify remote branch/tag parity.
+
+## Findings and decisions
+
+- 2026-08-21 — The current health route already returns HTTP 200 with
+  `service: autoquant-studio`; readiness requires no new server protocol.
+- 2026-08-21 — Standalone port `0` remains valid for OS allocation. Hosted
+  injected ports are stricter and must be in `1..65535`.
+- 2026-08-21 — CLI parser defaults will become unresolved `None` values only
+  internally so explicitness survives parsing; public standalone defaults stay
+  `127.0.0.1:8765` and capability discovery continues to describe them.
+
+## Verification
+
+- Pending.
+
+## Progress log
+
+- 2026-08-21 — Plan activated from clean `main` at `0913ebd`; no OpenAlice
+  repository change is in scope.
+
+## Completion
+
+Pending.

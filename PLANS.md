@@ -18,7 +18,9 @@ invariants live in `docs/design/`.
 
 ## Active plans
 
-None.
+| Plan | Outcome | Updated |
+| --- | --- | --- |
+| [[plans/openalice-harness-studio-capability]] | Let OpenAlice discover and launch the existing Studio on one host-assigned fixed loopback port without changing standalone operation. | 2026-08-21 |
 
 ## Proposed plans
 
