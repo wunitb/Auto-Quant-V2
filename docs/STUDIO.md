@@ -38,18 +38,18 @@ probes Git or package metadata independently. See
 The default bind is intentionally loopback-only. V1 has no authentication.
 Binding `--host` to a non-loopback address is an explicit operator decision.
 
-## OpenAlice-managed launch
+## Harness-managed launch
 
 The repository-root `harness.json` lets a compatible Harness discover Studio
-without an AutoQuant-specific SDK. OpenAlice executes the same public command
-from the Workspace root and injects one named loopback port. A reproducible
-managed launch is:
+without an AutoQuant-specific SDK. OpenAlice or another compatible supervisor
+executes the same public command from the Workspace root and injects one named
+loopback port. A reproducible managed launch is:
 
 ```bash
-OPENALICE_CAPABILITY=studio \
-OPENALICE_CAPABILITY_HOST=127.0.0.1 \
-OPENALICE_CAPABILITY_PORTS='{"http":49321}' \
-OPENALICE_CAPABILITY_NO_OPEN=1 \
+HARNESS_CAPABILITY=studio \
+HARNESS_HOST=127.0.0.1 \
+HARNESS_PORTS='{"http":49321}' \
+HARNESS_NO_OPEN=1 \
 aq studio serve . --no-open
 ```
 
@@ -61,10 +61,23 @@ curl --fail http://127.0.0.1:49321/api/v1/health
 
 Managed mode binds exactly the injected host and `http` port. Missing,
 malformed, non-integer, boolean, zero, or out-of-range port authority fails
-before listening. An occupied port also fails; AutoQuant never selects a
-replacement. Explicit `--host` or `--port` values must equal their injected
-values. Outside exact `OPENALICE_CAPABILITY=studio` mode, these environment
-variables do not affect standalone behavior.
+before listening. Missing or extra port names fail because `HARNESS_PORTS` must
+match the manifest exactly. An occupied port also fails; AutoQuant never
+selects a replacement. Explicit `--host` or `--port` values must equal their
+injected values. Outside exact `HARNESS_CAPABILITY=studio` mode, these
+environment variables do not affect standalone behavior. Older
+vendor-specific environment names are not managed-launch aliases.
+
+Standalone responses retain `frame-ancestors 'none'`,
+`X-Frame-Options: DENY`, and same-origin resource policy. Managed responses
+omit the latter two headers and allow framing only from `app:`, loopback HTTP,
+`localhost`, and localhost subdomains; they never use a wildcard ancestor.
+Mode is explicit process state, not a guess from the request `Host`.
+
+The page, packaged assets, health/snapshot APIs, and polling all use the
+current origin. Studio neither reads host authentication state nor redirects
+to its injected bind address. There is currently no SSE or WebSocket route;
+the supervisor needs only ordinary HTTP proxying for this Studio version.
 
 ## What the page shows
 

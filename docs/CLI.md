@@ -1336,13 +1336,14 @@ does not support `--json` because its stdout announces a live URL rather than
 one terminal envelope. Loopback is the default; non-loopback binding is an
 explicit operator choice and V1 has no authentication.
 
-When `OPENALICE_CAPABILITY=studio`, the command enters strict Harness-managed
-launch. It requires `OPENALICE_CAPABILITY_HOST` and JSON
-`OPENALICE_CAPABILITY_PORTS` with one integer `http` port in `1..65535`, binds
-that exact endpoint, and fails instead of finding another port. Conflicting
-explicit `--host`/`--port` values are invalid, while equal repetitions are
-allowed. `OPENALICE_CAPABILITY_NO_OPEN=1` forces no-browser operation. Other
-capability values do not alter standalone defaults or flags. See
+When `HARNESS_CAPABILITY=studio`, the command enters strict Harness-managed
+launch. It requires `HARNESS_HOST` and JSON `HARNESS_PORTS` with exactly the
+manifest-declared names—currently one integer `http` port in `1..65535`—binds
+that exact endpoint, and fails instead of finding another port. Missing or
+extra names and conflicting explicit `--host`/`--port` values are invalid,
+while equal repetitions are allowed. `HARNESS_NO_OPEN=1` forces no-browser
+operation. Other capability values do not alter standalone defaults, flags,
+or response security. See
 [[docs/STUDIO]].
 
 ## Success envelope

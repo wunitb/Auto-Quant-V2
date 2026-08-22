@@ -379,6 +379,10 @@ universe, clock, interval, or history. See
 - materializing or discovering the Workspace desk;
 - starting, resuming, and attributing native coding-Agent Sessions;
 - cross-Workspace task assignment, scheduling, communication, and delivery;
+- capability port allocation, foreground process supervision, readiness, and
+  opaque Web Surface routing;
+- public browser origin and product chrome without forwarding host Cookie,
+  Authorization, or CSRF authority into AutoQuant;
 - host-authenticated identity, credentials, Inbox, and shared tool injection.
 
 OpenAlice is the first-party host example. AutoQuant cannot require or
@@ -435,6 +439,9 @@ cannot own Workspace, Project, or evidence semantics.
   The Studio must not become a second evaluator.
 - Standalone and hosted Workspaces use the same Core, schemas, CLI, Project
   formats, evaluation semantics, and evidence.
+- Exact generic managed authority may change only Studio bind, browser-open,
+  and restricted embedding policy; without it, standalone launch and response
+  security remain unchanged.
 - Project truth remains recoverable from files and immutable artifacts without
   requiring private Agent conversation history.
 - Reports and Dossiers are durable deliverables, not mandatory integration

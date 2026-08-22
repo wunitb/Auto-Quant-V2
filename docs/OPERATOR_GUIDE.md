@@ -245,9 +245,13 @@ It shows effective Workspace configuration, Projects, requests, Agent work
 briefs, Studies, Sessions, Runs, experiments, evidence explorers, Reports,
 Reviews, Dossiers, diagnostics, and copyable next commands. It does not create
 private orchestration or alternative research truth. See [[docs/STUDIO]].
-OpenAlice may discover this same server through the repository-root
-`harness.json`, assign its loopback port, and probe the existing health route;
-AutoQuant still owns the HTTP process and read model.
+A compatible supervisor may discover this same server through the
+repository-root `harness.json`, assign its loopback port, and probe the existing
+health route. Exact `HARNESS_CAPABILITY=studio` launch keeps the command in the
+foreground, uses only the injected endpoint, suppresses browser opening, and
+permits only the restricted Harness embedding origins. AutoQuant still owns
+the HTTP process and read model; the host owns public routing and product
+chrome. Standalone launch and its strict anti-frame policy remain unchanged.
 
 ## Where to continue
 
