@@ -1,6 +1,6 @@
 # AutoQuant V2 current status
 
-Status: `v0.9.33` is the current AutoQuant release and `v0.8.31`
+Status: `v0.9.34` is the current AutoQuant release and `v0.8.31`
 remains the Harness currently consumed by OpenAlice until the host deliberately
 selects a newer tag.
 
@@ -17,14 +17,21 @@ historical proof remains in completed plans and immutable Git tags.
 
 ## Current milestone
 
-The `0.9.33` release makes the existing manifest v1 Studio capability usable
-by OpenAlice or another compatible Harness supervisor without creating a
-host-specific product edition. Exact `HARNESS_CAPABILITY=studio` mode requires
-a non-empty `HARNESS_HOST` and an unambiguous `HARNESS_PORTS` object whose names
-match the manifest exactly: one integer `http` value in `1..65535`. Studio
-binds only that endpoint. Missing, malformed, incomplete, extra, conflicting,
-or occupied authority fails instead of scanning, incrementing, or falling
-back. `HARNESS_NO_OPEN=1` suppresses the browser.
+The `0.9.34` release fixes the prepared source-Workspace launch boundary found
+by real `0.9.33` host acceptance. A clone prepared independently with
+`uv sync --frozen` can run every standalone `uv run aq ...` route, while the
+literal manifest command uses `uv run --frozen --no-sync` to select that same
+repository-owned environment under an ordinary supervisor `PATH`. Capability
+launch cannot update the lock or synchronize dependencies, and missing
+preparation fails explicitly instead of asking the host to repair AutoQuant.
+
+Exact `HARNESS_CAPABILITY=studio` mode now accepts only `localhost` or canonical
+IPv4 loopback literals in `127/8`, plus an unambiguous `HARNESS_PORTS` object
+whose names match the manifest exactly: one integer `http` value in
+`1..65535`. Wildcard, interface/public, arbitrary hostname, IPv6, whitespace,
+malformed, incomplete, extra, conflicting, or occupied authority fails before
+listening. Studio never scans, increments, or falls back.
+`HARNESS_NO_OPEN=1` suppresses the browser.
 
 Managed state is explicit from launch resolution through HTTP response policy.
 Only managed responses omit `X-Frame-Options` and same-origin resource policy;
@@ -40,19 +47,19 @@ CSRF state and does not redirect to its injected bind address. It currently
 has no SSE or WebSocket transport. Focused source tests cover the complete
 manifest, launch, security-header, opaque Host, browser, occupied-port,
 conflict, readiness, and SIGTERM contract. Exact release proof accumulates in
-[[plans/generic-harness-web-surface]].
+[[plans/prepared-source-workspace-harness-command]].
 
 The root sample preserves all seventeen prior Runs byte-for-byte and adds two
 clean-commit candidate Runs proving current Factor and Portfolio projections
 under the separated authorities. It now contains nineteen immutable Runs and
 no governed-RL baseline. OpenAlice remains independently pinned to `v0.8.31`.
 
-The complete source regression passes all 464 tests in 1,239.939 seconds.
-Lock consistency, Python compilation, Studio JavaScript syntax, diff hygiene,
-and all 1,567 current documentation links also pass. Clean build/install,
-package closure, no-override clone, manifest-command managed health and
-security headers, occupied-port failure, standalone isolation, and SIGTERM
-cleanup are recorded in [[plans/generic-harness-web-surface]].
+Focused source verification currently passes 21 Studio and version tests,
+including copied prepared and unprepared source Workspaces under an ordinary
+parent `PATH`. Complete regression, build/install, clean-clone replay, package
+closure, manifest-command managed health/security, standalone isolation, and
+immutable tag evidence are recorded in
+[[plans/prepared-source-workspace-harness-command]].
 
 ## What works today
 

@@ -22,6 +22,7 @@ It is deliberately not a second current-status page or release checklist:
 
 | Release | Bounded outcome | Exact evidence |
 | --- | --- | --- |
+| `v0.9.34` | Made the checked-in Studio capability executable from an independently prepared source Workspace and restricted managed binds to supported loopback authority. | [[plans/prepared-source-workspace-harness-command]] |
 | `v0.9.33` | Made the Studio capability vendor-neutral, manifest-exact, origin-neutral, and restrictively embeddable only under explicit Harness supervision. | [[plans/generic-harness-web-surface]] |
 | `v0.9.32` | Added standard Harness discovery and strict host-assigned fixed-port launch for the existing Studio while preserving standalone behavior. | [[plans/openalice-harness-studio-capability]] |
 | `v0.9.31` | Made temporal Factor applicability, material train/validation tension, and exact evidence-bound Report drafting explicit to coding Agents. | [[plans/factor-evidence-report-handoff]] |

@@ -99,6 +99,9 @@ in [GitHub issue #2](https://github.com/TraderAlice/Auto-Quant-V2/issues/2).
   `uv sync --frozen` and launched through the literal manifest argv under an
   ordinary parent `PATH`.
 - `python scripts/check_doc_links.py` — all 1,571 documentation links resolve.
+- Candidate version reconciliation: `uv lock --check`, `uv sync --frozen`, and
+  the 21 focused tests pass in 33.305 seconds at product version `0.9.34`; all
+  1,572 documentation links resolve.
 
 ## Progress log
 
@@ -113,6 +116,9 @@ in [GitHub issue #2](https://github.com/TraderAlice/Auto-Quant-V2/issues/2).
   supervisor execution, managed host authority, and unchanged standalone
   behavior across the Studio, CLI, operator, architecture, and product-model
   contracts.
+- 2026-08-22 — Reconciled every product-version authority at `0.9.34` and
+  refreshed the repository-owned editable environment before the release
+  audit.
 
 ## Completion
 
