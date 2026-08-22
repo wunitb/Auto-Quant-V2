@@ -47,8 +47,12 @@ clean-commit candidate Runs proving current Factor and Portfolio projections
 under the separated authorities. It now contains nineteen immutable Runs and
 no governed-RL baseline. OpenAlice remains independently pinned to `v0.8.31`.
 
-The complete `0.9.33` source and installed-distribution release audit is
-recorded in [[plans/generic-harness-web-surface]].
+The complete source regression passes all 464 tests in 1,239.939 seconds.
+Lock consistency, Python compilation, Studio JavaScript syntax, diff hygiene,
+and all 1,567 current documentation links also pass. Clean build/install,
+package closure, no-override clone, manifest-command managed health and
+security headers, occupied-port failure, standalone isolation, and SIGTERM
+cleanup are recorded in [[plans/generic-harness-web-surface]].
 
 ## What works today
 

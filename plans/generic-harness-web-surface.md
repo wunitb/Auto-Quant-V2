@@ -98,7 +98,17 @@ public origin.
 
 ## Verification
 
-- Pending.
+- Source candidate `0dbf6836e4753a5f2d1f9f6adde608fe451c1625` was clean
+  before the complete audit.
+- `uv lock --check`, Python compilation, Studio JavaScript syntax, and
+  `git diff --check` passed.
+- `uv run python scripts/check_doc_links.py` resolved all 1,567 documentation
+  links.
+- `uv run python -m unittest discover -s tests -v` passed all 464 tests in
+  1,239.939 seconds. The existing bounded RL empty-slice NumPy/Pandas warnings
+  were the only warnings; no checked-in Project or immutable Run changed.
+- Build/install, package-closure, clean-clone, and final exact-commit evidence
+  remain pending.
 
 ## Progress log
 
@@ -112,6 +122,8 @@ public origin.
   CLI, architecture, and Studio contract documentation. The versioned focused
   replay passes 20 tests in 17.775 seconds and all 1,567 documentation links
   resolve.
+- 2026-08-22 — The clean complete source audit passed all 464 tests in
+  1,239.939 seconds with no sample or immutable-evidence changes.
 
 ## Completion
 
