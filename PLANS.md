@@ -18,7 +18,9 @@ invariants live in `docs/design/`.
 
 ## Active plans
 
-None.
+| Plan | Outcome | Updated |
+| --- | --- | --- |
+| [[plans/generic-harness-web-surface]] | Make Studio a vendor-neutral, strictly supervised, origin-neutral, managed-only embeddable Harness Web Surface without weakening standalone security. | 2026-08-22 |
 
 ## Proposed plans
 

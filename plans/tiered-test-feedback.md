@@ -1,8 +1,8 @@
 # Tiered test feedback
 
 - Status: `proposed`
-- Target release: `0.9.33`
-- Updated: `2026-08-21`
+- Target release: `0.9.34`
+- Updated: `2026-08-22`
 - Related design: [[docs/design/documentation-system]] and
   [[docs/design/versioning-and-release]].
 
@@ -63,6 +63,9 @@ every inner loop is not necessary.
 
 - 2026-08-21 — Test strength and feedback latency are separate concerns. The
   goal is staged execution of the same protection, not a smaller trust model.
+- 2026-08-22 — The unstarted plan moved from `0.9.33` to `0.9.34` so the
+  externally required generic Harness Web Surface compatibility correction can
+  own `0.9.33` without combining release-contract and test-runner changes.
 
 ## Verification
 
