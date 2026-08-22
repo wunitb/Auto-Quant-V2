@@ -71,12 +71,28 @@ class StudioObservationTests(unittest.TestCase):
         environment = os.environ.copy()
         environment.update(
             {
-                "OPENALICE_CAPABILITY": "studio",
-                "OPENALICE_CAPABILITY_HOST": "127.0.0.1",
-                "OPENALICE_CAPABILITY_PORTS": json.dumps({"http": port}),
-                "OPENALICE_CAPABILITY_NO_OPEN": "1",
+                "HARNESS_CAPABILITY": "studio",
+                "HARNESS_HOST": "127.0.0.1",
+                "HARNESS_PORTS": json.dumps({"http": port}),
+                "HARNESS_NO_OPEN": "1",
             }
         )
+        return environment
+
+    def _manifest_command(self) -> list[str]:
+        root = Path(__file__).resolve().parents[1]
+        manifest = json.loads((root / "harness.json").read_text(encoding="utf-8"))
+        return manifest["capabilities"]["studio"]["command"]
+
+    def _standalone_environment(self) -> dict[str, str]:
+        environment = os.environ.copy()
+        for name in (
+            "HARNESS_CAPABILITY",
+            "HARNESS_HOST",
+            "HARNESS_PORTS",
+            "HARNESS_NO_OPEN",
+        ):
+            environment.pop(name, None)
         return environment
 
     def test_workspace_and_project_snapshots_share_verified_contract(self) -> None:
@@ -341,8 +357,16 @@ class StudioObservationTests(unittest.TestCase):
                     self.assertTrue(health["ok"])
                     self.assertEqual(health["mode"], "read-only")
                     self.assertEqual(response.headers["X-Frame-Options"], "DENY")
+                    self.assertEqual(
+                        response.headers["Cross-Origin-Resource-Policy"],
+                        "same-origin",
+                    )
                     self.assertIn(
                         "default-src 'none'",
+                        response.headers["Content-Security-Policy"],
+                    )
+                    self.assertIn(
+                        "frame-ancestors 'none'",
                         response.headers["Content-Security-Policy"],
                     )
                     self.assertIsNone(response.headers["Access-Control-Allow-Origin"])
@@ -708,6 +732,7 @@ class StudioObservationTests(unittest.TestCase):
             "not-json",
             "[]",
             "{}",
+            '{"http":49321,"controlPlane":49322}',
             '{"http":49321,"http":49322}',
             '{"http":true}',
             '{"http":49321.0}',
@@ -718,12 +743,12 @@ class StudioObservationTests(unittest.TestCase):
         for raw in invalid_ports:
             with self.subTest(raw=raw):
                 environment = {
-                    "OPENALICE_CAPABILITY": "studio",
-                    "OPENALICE_CAPABILITY_HOST": "127.0.0.1",
-                    "OPENALICE_CAPABILITY_NO_OPEN": "1",
+                    "HARNESS_CAPABILITY": "studio",
+                    "HARNESS_HOST": "127.0.0.1",
+                    "HARNESS_NO_OPEN": "1",
                 }
                 if raw is not None:
-                    environment["OPENALICE_CAPABILITY_PORTS"] = raw
+                    environment["HARNESS_PORTS"] = raw
                 with self.assertRaises(AutoQuantValidationError):
                     resolve_studio_launch(
                         host=None,
@@ -738,14 +763,18 @@ class StudioObservationTests(unittest.TestCase):
                 port=None,
                 no_open=False,
                 environ={
-                    "OPENALICE_CAPABILITY": "studio",
-                    "OPENALICE_CAPABILITY_PORTS": '{"http":49321}',
+                    "HARNESS_CAPABILITY": "studio",
+                    "HARNESS_PORTS": '{"http":49321}',
                 },
             )
 
     def test_non_managed_environment_preserves_standalone_launch(self) -> None:
         noisy_environment = {
-            "OPENALICE_CAPABILITY": "another-capability",
+            "HARNESS_CAPABILITY": "another-capability",
+            "HARNESS_HOST": "192.0.2.1",
+            "HARNESS_PORTS": "not-json",
+            "HARNESS_NO_OPEN": "1",
+            "OPENALICE_CAPABILITY": "studio",
             "OPENALICE_CAPABILITY_HOST": "192.0.2.1",
             "OPENALICE_CAPABILITY_PORTS": "not-json",
             "OPENALICE_CAPABILITY_NO_OPEN": "1",
@@ -787,6 +816,7 @@ class StudioObservationTests(unittest.TestCase):
             host="127.0.0.1",
             port=49321,
             open_browser=False,
+            managed=True,
         )
 
     def test_managed_cli_uses_real_fixed_port_and_health_readiness(self) -> None:
@@ -833,6 +863,168 @@ class StudioObservationTests(unittest.TestCase):
                 process.stdout.close()
                 process.stderr.close()
 
+    def test_manifest_command_is_origin_neutral_embeddable_and_releases_on_sigterm(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = initialize_workspace(Path(directory) / "desk")
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+                probe.bind(("127.0.0.1", 0))
+                port = probe.getsockname()[1]
+            default_was_free = False
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as default_probe:
+                default_was_free = default_probe.connect_ex(
+                    ("127.0.0.1", 8765)
+                ) != 0
+            environment = self._managed_environment(port)
+            environment["PATH"] = (
+                f"{Path(sys.executable).parent}{os.pathsep}"
+                f"{environment.get('PATH', '')}"
+            )
+            process = subprocess.Popen(
+                self._manifest_command(),
+                cwd=workspace.root_dir,
+                env=environment,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            try:
+                announcement = process.stdout.readline().strip()
+                self.assertEqual(
+                    announcement,
+                    f"AutoQuant Studio: http://127.0.0.1:{port}",
+                    process.stderr.read() if process.poll() is not None else "",
+                )
+                base = f"http://127.0.0.1:{port}"
+                headers = {
+                    "Host": "oa-surface-autoquant.localhost",
+                    "Cookie": "openalice-session=must-not-be-required",
+                    "Authorization": "Bearer must-not-be-required",
+                    "X-CSRF-Token": "must-not-be-required",
+                }
+                for path, expected in (
+                    ("/", b"Quant research desk"),
+                    ("/assets/studio.css", b"--bg"),
+                    ("/assets/studio.js", b'/api/v1/snapshot'),
+                ):
+                    with urlopen(Request(f"{base}{path}", headers=headers), timeout=3) as response:
+                        body = response.read()
+                        self.assertEqual(response.status, 200)
+                        self.assertIn(expected, body)
+                        csp = response.headers["Content-Security-Policy"]
+                        self.assertIn(
+                            "frame-ancestors app: http://127.0.0.1:* "
+                            "http://localhost:* http://*.localhost:*",
+                            csp,
+                        )
+                        self.assertNotIn("frame-ancestors *", csp)
+                        self.assertIsNone(response.headers["X-Frame-Options"])
+                        self.assertIsNone(
+                            response.headers["Cross-Origin-Resource-Policy"]
+                        )
+                        self.assertIsNone(response.headers["Location"])
+                with urlopen(
+                    Request(f"{base}/api/v1/health", headers=headers), timeout=3
+                ) as response:
+                    self.assertEqual(response.status, 200)
+                    self.assertEqual(
+                        json.loads(response.read())["service"],
+                        "autoquant-studio",
+                    )
+                with urlopen(
+                    Request(f"{base}/api/v1/snapshot", headers=headers), timeout=3
+                ) as response:
+                    self.assertEqual(response.status, 200)
+                    self.assertEqual(
+                        json.loads(response.read())["kind"],
+                        "autoquant-studio-snapshot",
+                    )
+                if default_was_free:
+                    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as check:
+                        self.assertNotEqual(check.connect_ex(("127.0.0.1", 8765)), 0)
+            finally:
+                process.terminate()
+                process.wait(timeout=5)
+                process.stdout.close()
+                process.stderr.close()
+
+            self.assertNotEqual(process.returncode, None)
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener_check:
+                self.assertNotEqual(
+                    listener_check.connect_ex(("127.0.0.1", port)), 0
+                )
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as released:
+                released.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                released.bind(("127.0.0.1", port))
+
+    def test_managed_no_open_environment_suppresses_real_browser_opener(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = initialize_workspace(Path(directory) / "desk")
+            marker = Path(directory) / "browser-opened"
+            opener = Path(directory) / "browser-opener"
+            opener.write_text(
+                "#!/bin/sh\nprintf opened > \"$AUTOQUANT_BROWSER_MARKER\"\n",
+                encoding="utf-8",
+            )
+            opener.chmod(0o755)
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+                probe.bind(("127.0.0.1", 0))
+                port = probe.getsockname()[1]
+            command = [
+                item for item in self._manifest_command() if item != "--no-open"
+            ]
+            environment = self._managed_environment(port)
+            environment.update(
+                {
+                    "AUTOQUANT_BROWSER_MARKER": str(marker),
+                    "BROWSER": str(opener),
+                    "PATH": (
+                        f"{Path(sys.executable).parent}{os.pathsep}"
+                        f"{environment.get('PATH', '')}"
+                    ),
+                }
+            )
+            process = subprocess.Popen(
+                command,
+                cwd=workspace.root_dir,
+                env=environment,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            try:
+                process.stdout.readline()
+                with urlopen(
+                    f"http://127.0.0.1:{port}/api/v1/health", timeout=3
+                ) as response:
+                    self.assertEqual(response.status, 200)
+                time.sleep(0.2)
+                self.assertFalse(marker.exists())
+            finally:
+                process.terminate()
+                process.wait(timeout=5)
+                process.stdout.close()
+                process.stderr.close()
+
+    def test_frontend_has_only_current_origin_http_transport(self) -> None:
+        assets = Path(__file__).resolve().parents[1] / "autoquant" / "studio_assets"
+        html = (assets / "index.html").read_text(encoding="utf-8")
+        javascript = (assets / "studio.js").read_text(encoding="utf-8")
+        self.assertIn('href="/assets/studio.css"', html)
+        self.assertIn('src="/assets/studio.js"', html)
+        self.assertIn('fetch("/api/v1/snapshot"', javascript)
+        for fixed_origin in (
+            "http://127.0.0.1",
+            "http://localhost",
+            "ws://",
+            "wss://",
+        ):
+            self.assertNotIn(fixed_origin, html)
+            self.assertNotIn(fixed_origin, javascript)
+        self.assertNotIn("EventSource(", javascript)
+        self.assertNotIn("WebSocket(", javascript)
+
     def test_managed_cli_fails_when_injected_port_is_occupied(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             workspace, _, _ = self._setup(directory)
@@ -862,6 +1054,31 @@ class StudioObservationTests(unittest.TestCase):
         self.assertEqual(result.stdout, "")
         self.assertIn("Address already in use", result.stderr)
 
+    def test_managed_cli_subprocess_rejects_conflicting_explicit_port(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = initialize_workspace(Path(directory) / "desk")
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+                probe.bind(("127.0.0.1", 0))
+                port = probe.getsockname()[1]
+            environment = self._managed_environment(port)
+            environment["PATH"] = (
+                f"{Path(sys.executable).parent}{os.pathsep}"
+                f"{environment.get('PATH', '')}"
+            )
+            result = subprocess.run(
+                [*self._manifest_command(), "--port", str(port + 1)],
+                cwd=workspace.root_dir,
+                env=environment,
+                capture_output=True,
+                check=False,
+                text=True,
+                timeout=5,
+            )
+
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.stdout, "")
+        self.assertIn("conflicts with injected port", result.stderr)
+
     def test_cli_serve_announces_a_live_local_read_only_url(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             workspace, _, _ = self._setup(directory)
@@ -877,6 +1094,7 @@ class StudioObservationTests(unittest.TestCase):
                     "0",
                     "--no-open",
                 ],
+                env=self._standalone_environment(),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
@@ -890,6 +1108,15 @@ class StudioObservationTests(unittest.TestCase):
                 url = announcement.removeprefix("AutoQuant Studio: ")
                 with urlopen(f"{url}/api/v1/health", timeout=3) as response:
                     self.assertEqual(json.loads(response.read())["mode"], "read-only")
+                    self.assertEqual(response.headers["X-Frame-Options"], "DENY")
+                    self.assertEqual(
+                        response.headers["Cross-Origin-Resource-Policy"],
+                        "same-origin",
+                    )
+                    self.assertIn(
+                        "frame-ancestors 'none'",
+                        response.headers["Content-Security-Policy"],
+                    )
             finally:
                 process.terminate()
                 process.wait(timeout=5)

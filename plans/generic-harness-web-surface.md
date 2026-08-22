@@ -69,11 +69,11 @@ public origin.
 
 ## Work
 
-- [ ] Replace the vendor-specific launch resolver with strict manifest-matched
+- [x] Replace the vendor-specific launch resolver with strict manifest-matched
   `HARNESS_*` authority while preserving standalone isolation.
-- [ ] Split standalone and managed security headers and thread managed state
+- [x] Split standalone and managed security headers and thread managed state
   explicitly through CLI, server creation, and request handling.
-- [ ] Add bounded unit and real-subprocess acceptance coverage, including
+- [x] Add bounded unit and real-subprocess acceptance coverage, including
   opaque Host routing and SIGTERM cleanup.
 - [ ] Update durable Studio/CLI/operator/architecture/version documentation and
   prepare the patch-version authorities.
@@ -90,6 +90,11 @@ public origin.
   the generic contract says only exact `HARNESS_CAPABILITY=studio` activates
   managed mode, and permanent dual parsing would make launch authority
   ambiguous before another host contract has shipped.
+- 2026-08-22 — macOS retains closed client connections briefly in `TIME_WAIT`.
+  SIGTERM acceptance therefore proves both that the listener rejects new
+  connections and that a fresh Studio-style `SO_REUSEADDR` listener can bind
+  the same endpoint immediately; it does not confuse connection bookkeeping
+  with an owned process or listening-socket leak.
 
 ## Verification
 
@@ -100,6 +105,9 @@ public origin.
 - 2026-08-22 — Read the Harness Web Surface v1 contract and acceptance matrix,
   inspected the real manifest, launcher, response headers, frontend URL use,
   readiness route, and current subprocess tests, then activated this plan.
+- 2026-08-22 — Implemented generic launch authority, explicit mode-specific
+  response policies, and real foreground-process tests. All 20 Studio/version
+  focused tests pass in 16.654 seconds.
 
 ## Completion
 

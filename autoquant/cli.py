@@ -5488,6 +5488,7 @@ def _studio_serve(args: argparse.Namespace) -> CommandResult:
         host=launch.host,
         port=launch.port,
         open_browser=launch.open_browser,
+        managed=launch.managed,
     )
     return CommandResult(
         "studio.serve",

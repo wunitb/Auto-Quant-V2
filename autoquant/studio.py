@@ -69,10 +69,11 @@ from .workspace import (
 
 
 STUDIO_KIND = "autoquant-studio-snapshot"
-OPENALICE_CAPABILITY = "OPENALICE_CAPABILITY"
-OPENALICE_CAPABILITY_HOST = "OPENALICE_CAPABILITY_HOST"
-OPENALICE_CAPABILITY_PORTS = "OPENALICE_CAPABILITY_PORTS"
-OPENALICE_CAPABILITY_NO_OPEN = "OPENALICE_CAPABILITY_NO_OPEN"
+HARNESS_CAPABILITY = "HARNESS_CAPABILITY"
+HARNESS_HOST = "HARNESS_HOST"
+HARNESS_PORTS = "HARNESS_PORTS"
+HARNESS_NO_OPEN = "HARNESS_NO_OPEN"
+STUDIO_MANAGED_PORT_NAMES = frozenset({"http"})
 STANDALONE_STUDIO_HOST = "127.0.0.1"
 STANDALONE_STUDIO_PORT = 8765
 
@@ -93,7 +94,7 @@ STUDIO_ASSETS = {
     "/assets/studio.css": ("studio.css", "text/css; charset=utf-8"),
     "/assets/studio.js": ("studio.js", "text/javascript; charset=utf-8"),
 }
-SECURITY_HEADERS = {
+STANDALONE_SECURITY_HEADERS = {
     "Content-Security-Policy": (
         "default-src 'none'; script-src 'self'; style-src 'self'; "
         "img-src 'self' data:; connect-src 'self'; font-src 'self'; "
@@ -107,6 +108,25 @@ SECURITY_HEADERS = {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
 }
+MANAGED_SECURITY_HEADERS = {
+    "Content-Security-Policy": (
+        "default-src 'none'; script-src 'self'; style-src 'self'; "
+        "img-src 'self' data:; connect-src 'self'; font-src 'self'; "
+        "base-uri 'none'; form-action 'none'; frame-ancestors app: "
+        "http://127.0.0.1:* http://localhost:* http://*.localhost:*"
+    ),
+    "Permissions-Policy": (
+        "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+    ),
+    "Referrer-Policy": "no-referrer",
+    "X-Content-Type-Options": "nosniff",
+}
+
+
+def studio_security_headers(*, managed: bool) -> Mapping[str, str]:
+    """Return the explicit launch-mode response policy."""
+
+    return MANAGED_SECURITY_HEADERS if managed else STANDALONE_SECURITY_HEADERS
 
 
 def _issue(path: Path | str, code: str, message: str) -> ValidationIssue:
@@ -118,7 +138,7 @@ def _managed_ports(raw: str | None) -> dict[str, Any]:
         raise AutoQuantValidationError(
             [
                 _issue(
-                    OPENALICE_CAPABILITY_PORTS,
+                    HARNESS_PORTS,
                     "studio.managed-ports",
                     "Managed Studio requires an injected JSON ports object",
                 )
@@ -139,7 +159,7 @@ def _managed_ports(raw: str | None) -> dict[str, Any]:
         raise AutoQuantValidationError(
             [
                 _issue(
-                    OPENALICE_CAPABILITY_PORTS,
+                    HARNESS_PORTS,
                     "studio.managed-ports",
                     "Managed Studio ports must be one unambiguous JSON object",
                 )
@@ -149,7 +169,7 @@ def _managed_ports(raw: str | None) -> dict[str, Any]:
         raise AutoQuantValidationError(
             [
                 _issue(
-                    OPENALICE_CAPABILITY_PORTS,
+                    HARNESS_PORTS,
                     "studio.managed-ports",
                     "Managed Studio ports must be a JSON object",
                 )
@@ -165,10 +185,10 @@ def resolve_studio_launch(
     no_open: bool,
     environ: Mapping[str, str] | None = None,
 ) -> StudioLaunch:
-    """Resolve standalone defaults or strict OpenAlice Studio authority."""
+    """Resolve standalone defaults or strict generic Harness authority."""
 
     environment = os.environ if environ is None else environ
-    if environment.get(OPENALICE_CAPABILITY) != "studio":
+    if environment.get(HARNESS_CAPABILITY) != "studio":
         return StudioLaunch(
             host=STANDALONE_STUDIO_HOST if host is None else host,
             port=STANDALONE_STUDIO_PORT if port is None else port,
@@ -176,7 +196,7 @@ def resolve_studio_launch(
             managed=False,
         )
 
-    injected_host = environment.get(OPENALICE_CAPABILITY_HOST)
+    injected_host = environment.get(HARNESS_HOST)
     if (
         injected_host is None
         or not injected_host
@@ -185,20 +205,22 @@ def resolve_studio_launch(
         raise AutoQuantValidationError(
             [
                 _issue(
-                    OPENALICE_CAPABILITY_HOST,
+                    HARNESS_HOST,
                     "studio.managed-host",
                     "Managed Studio requires one non-empty injected host",
                 )
             ]
         )
-    ports = _managed_ports(environment.get(OPENALICE_CAPABILITY_PORTS))
-    if "http" not in ports:
+    ports = _managed_ports(environment.get(HARNESS_PORTS))
+    if set(ports) != STUDIO_MANAGED_PORT_NAMES:
+        declared = ", ".join(sorted(STUDIO_MANAGED_PORT_NAMES))
         raise AutoQuantValidationError(
             [
                 _issue(
-                    f"{OPENALICE_CAPABILITY_PORTS}.http",
-                    "studio.managed-http-port",
-                    "Managed Studio ports must include http",
+                    HARNESS_PORTS,
+                    "studio.managed-port-names",
+                    "Managed Studio ports must match the manifest exactly: "
+                    f"{declared}",
                 )
             ]
         )
@@ -211,7 +233,7 @@ def resolve_studio_launch(
         raise AutoQuantValidationError(
             [
                 _issue(
-                    f"{OPENALICE_CAPABILITY_PORTS}.http",
+                    f"{HARNESS_PORTS}.http",
                     "studio.managed-http-port",
                     "Managed Studio http port must be an integer from 1 to 65535",
                 )
@@ -241,7 +263,7 @@ def resolve_studio_launch(
         port=injected_port,
         open_browser=(
             not no_open
-            and environment.get(OPENALICE_CAPABILITY_NO_OPEN) != "1"
+            and environment.get(HARNESS_NO_OPEN) != "1"
         ),
         managed=True,
     )
@@ -1934,6 +1956,8 @@ def _error_payload(error: Exception) -> tuple[int, dict[str, Any]]:
 def _handler(
     directory: Path,
     project_id: str | None,
+    *,
+    managed: bool,
 ) -> type[BaseHTTPRequestHandler]:
     class StudioHandler(BaseHTTPRequestHandler):
         server_version = "AutoQuantStudio/0.1"
@@ -1950,7 +1974,7 @@ def _handler(
             self.send_header("Content-Type", content_type)
             self.send_header("Content-Length", str(length))
             self.send_header("Cache-Control", cache_control)
-            for key, value in SECURITY_HEADERS.items():
+            for key, value in studio_security_headers(managed=managed).items():
                 self.send_header(key, value)
             self.end_headers()
 
@@ -2087,6 +2111,7 @@ def create_studio_server(
     project_id: str | None = None,
     host: str = "127.0.0.1",
     port: int = 8765,
+    managed: bool = False,
 ) -> AutoQuantStudioServer:
     if not isinstance(port, int) or isinstance(port, bool) or not 0 <= port <= 65535:
         raise AutoQuantValidationError(
@@ -2096,7 +2121,7 @@ def create_studio_server(
     build_studio_snapshot(root, project_id=project_id)
     return AutoQuantStudioServer(
         (host, port),
-        _handler(root, project_id),
+        _handler(root, project_id, managed=managed),
     )
 
 
@@ -2107,12 +2132,14 @@ def serve_studio(
     host: str = "127.0.0.1",
     port: int = 8765,
     open_browser: bool = True,
+    managed: bool = False,
 ) -> None:
     server = create_studio_server(
         directory,
         project_id=project_id,
         host=host,
         port=port,
+        managed=managed,
     )
     display_host = "127.0.0.1" if host in {"0.0.0.0", "::"} else host
     url = f"http://{display_host}:{server.server_port}"
