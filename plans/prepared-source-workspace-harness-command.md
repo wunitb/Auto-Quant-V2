@@ -1,6 +1,6 @@
 # Prepared source Workspace Harness command
 
-- Status: `active`
+- Status: `completed`
 - Target release: `0.9.34`
 - Updated: `2026-08-22`
 - Related design: [[docs/design/studio-observation-surface]],
@@ -51,7 +51,7 @@ in [GitHub issue #2](https://github.com/TraderAlice/Auto-Quant-V2/issues/2).
 
 ## Acceptance
 
-- [ ] A clean source Workspace prepared only with documented AutoQuant commands
+- [x] A clean source Workspace prepared only with documented AutoQuant commands
   passes `aq` orientation/validation/Studio use independently of OpenAlice.
 - [x] The literal manifest argv starts after `uv sync --frozen` under an
   ordinary parent PATH with no `.venv/bin` insertion and reaches truthful HTTP
@@ -64,7 +64,7 @@ in [GitHub issue #2](https://github.com/TraderAlice/Auto-Quant-V2/issues/2).
 - [x] Standalone defaults, explicit host/port/browser behavior, security headers,
   current-origin assets, managed embedding, occupied-port failure, and SIGTERM
   cleanup remain unchanged.
-- [ ] Focused tests, complete source audit, build/install, clean-clone replay,
+- [x] Focused tests, complete source audit, build/install, clean-clone replay,
   immutable `v0.9.34` tag, and remote SHA verification pass.
 
 ## Work
@@ -74,7 +74,7 @@ in [GitHub issue #2](https://github.com/TraderAlice/Auto-Quant-V2/issues/2).
   Workspace acceptance and focused negative cases.
 - [x] Update durable Studio, CLI, operator, architecture, status, and release
   documentation without expanding README workflow detail.
-- [ ] Complete the full release and installed-artifact audit, publish the tag,
+- [x] Complete the full release and installed-artifact audit, publish the tag,
   verify remote parity, and close issue #2 with exact evidence.
 
 ## Findings and decisions
@@ -106,6 +106,27 @@ in [GitHub issue #2](https://github.com/TraderAlice/Auto-Quant-V2/issues/2).
   JavaScript syntax, diff hygiene, documentation-link verification, and all
   465 unit/integration tests passed; the full suite completed in 1,165.336
   seconds.
+- Clean candidate `0cd3d2835333ecabf0238d9a3090d6f47b14a971` built and
+  installed under Python 3.11.14. The wheel reports version `0.9.34`, that
+  exact commit, `dirty: false`, `embedded-distribution`, and runtime source
+  hash `f018f00363e9e3ea7500887c1e33a8a17882a8c67f7bce63ae1d474915782138`.
+  It contains 185 entries with no missing Studio, Project-template, or
+  Workspace-Skill runtime asset.
+- Candidate artifact SHA-256 values are
+  `e379572f2e091872365679e1d65f13a0b9c665641398a05bf9667286bfd35999`
+  for the wheel and
+  `42d43209b0e7e9f4e3446c0f2b171a6edd1676254ff05a4776c039db757dd767`
+  for the sdist.
+- A no-hardlink clone with no local override passed frozen preparation,
+  version/capability discovery, Project listing, orientation, validation, and
+  Studio snapshot through both its source environment and the freshly
+  installed wheel.
+- The literal manifest argv served health, root, assets, and snapshot on the
+  exact injected loopback port behind an opaque `oa-surface-v0934.localhost`
+  Host; emitted only the restricted managed framing policy; ignored supplied
+  host credentials; and released the listener after SIGTERM. Standalone
+  framing remained strict. Occupied port and wildcard host failed closed, and
+  an unprepared clone failed clearly without installing `aq`.
 
 ## Progress log
 
@@ -126,7 +147,18 @@ in [GitHub issue #2](https://github.com/TraderAlice/Auto-Quant-V2/issues/2).
 - 2026-08-22 — Completed the one release-level source audit with all 465 tests
   passing, including the ordinary-parent-PATH source copy, exact managed bind,
   security policy, process cleanup, and standalone regressions.
+- 2026-08-22 — Built and installed the candidate, replayed standalone commands
+  in a clean no-override clone, and completed the exact manifest HTTP,
+  restricted-host, occupied-port, browser/security, missing-preparation, and
+  process-release acceptance matrix.
 
 ## Completion
 
-Pending.
+AutoQuant `0.9.34` remains a complete independently operable quantitative
+research Workspace and fixes the source-managed Studio boundary without
+turning the product into an OpenAlice plugin. AutoQuant owns frozen runtime
+preparation, Core, CLI, Studio, and research evidence. A compatible supervisor
+discovers the checked-in manifest, supplies only supported loopback process
+authority, waits for truthful readiness, routes the existing Web Surface, and
+owns process teardown. No OpenAlice SDK, launch-time dependency sync, PATH
+mutation, UI change, research-semantic change, or fixture rewrite was added.
