@@ -53,15 +53,15 @@ in [GitHub issue #2](https://github.com/TraderAlice/Auto-Quant-V2/issues/2).
 
 - [ ] A clean source Workspace prepared only with documented AutoQuant commands
   passes `aq` orientation/validation/Studio use independently of OpenAlice.
-- [ ] The literal manifest argv starts after `uv sync --frozen` under an
+- [x] The literal manifest argv starts after `uv sync --frozen` under an
   ordinary parent PATH with no `.venv/bin` insertion and reaches truthful HTTP
   readiness on the exact injected port.
-- [ ] Missing preparation fails clearly without supervisor repair, while the
+- [x] Missing preparation fails clearly without supervisor repair, while the
   launch command cannot update the lock or synchronize dependencies.
-- [ ] Managed `127.0.0.1`, another canonical `127/8` literal, and `localhost`
+- [x] Managed `127.0.0.1`, another canonical `127/8` literal, and `localhost`
   resolve; `0.0.0.0`, public/interface addresses, arbitrary names, IPv6, and
   malformed values fail before bind.
-- [ ] Standalone defaults, explicit host/port/browser behavior, security headers,
+- [x] Standalone defaults, explicit host/port/browser behavior, security headers,
   current-origin assets, managed embedding, occupied-port failure, and SIGTERM
   cleanup remain unchanged.
 - [ ] Focused tests, complete source audit, build/install, clean-clone replay,
@@ -102,6 +102,10 @@ in [GitHub issue #2](https://github.com/TraderAlice/Auto-Quant-V2/issues/2).
 - Candidate version reconciliation: `uv lock --check`, `uv sync --frozen`, and
   the 21 focused tests pass in 33.305 seconds at product version `0.9.34`; all
   1,572 documentation links resolve.
+- Complete source audit: `uv lock --check`, Python compilation, Studio
+  JavaScript syntax, diff hygiene, documentation-link verification, and all
+  465 unit/integration tests passed; the full suite completed in 1,165.336
+  seconds.
 
 ## Progress log
 
@@ -119,6 +123,9 @@ in [GitHub issue #2](https://github.com/TraderAlice/Auto-Quant-V2/issues/2).
 - 2026-08-22 — Reconciled every product-version authority at `0.9.34` and
   refreshed the repository-owned editable environment before the release
   audit.
+- 2026-08-22 — Completed the one release-level source audit with all 465 tests
+  passing, including the ordinary-parent-PATH source copy, exact managed bind,
+  security policy, process cleanup, and standalone regressions.
 
 ## Completion
 

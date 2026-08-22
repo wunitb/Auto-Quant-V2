@@ -54,11 +54,11 @@ clean-commit candidate Runs proving current Factor and Portfolio projections
 under the separated authorities. It now contains nineteen immutable Runs and
 no governed-RL baseline. OpenAlice remains independently pinned to `v0.8.31`.
 
-Focused source verification currently passes 21 Studio and version tests,
-including copied prepared and unprepared source Workspaces under an ordinary
-parent `PATH`. Complete regression, build/install, clean-clone replay, package
-closure, manifest-command managed health/security, standalone isolation, and
-immutable tag evidence are recorded in
+The complete source regression passes all 465 tests in 1,165.336 seconds.
+Lock consistency, Python compilation, Studio JavaScript syntax, diff hygiene,
+and all 1,572 current documentation links also pass. Clean build/install,
+package closure, no-override clone, literal-manifest managed health/security,
+standalone isolation, and immutable tag evidence are recorded in
 [[plans/prepared-source-workspace-harness-command]].
 
 ## What works today
