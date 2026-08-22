@@ -1,7 +1,7 @@
 # Tiered test feedback
 
 - Status: `proposed`
-- Target release: `0.9.34`
+- Target release: `0.9.35`
 - Updated: `2026-08-22`
 - Related design: [[docs/design/documentation-system]] and
   [[docs/design/versioning-and-release]].
@@ -66,6 +66,10 @@ every inner loop is not necessary.
 - 2026-08-22 — The unstarted plan moved from `0.9.33` to `0.9.34` so the
   externally required generic Harness Web Surface compatibility correction can
   own `0.9.33` without combining release-contract and test-runner changes.
+- 2026-08-22 — The plan moved again to `0.9.35` after real OpenAlice acceptance
+  found that the `0.9.33` manifest command was not executable from an ordinarily
+  prepared source Workspace. The `0.9.34` fix remains isolated from test-runner
+  work.
 
 ## Verification
 

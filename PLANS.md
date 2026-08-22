@@ -18,7 +18,9 @@ invariants live in `docs/design/`.
 
 ## Active plans
 
-None.
+| Plan | Outcome | Updated |
+| --- | --- | --- |
+| [[plans/prepared-source-workspace-harness-command]] | Make the checked-in Studio command executable from an independently prepared source Workspace under an ordinary supervisor PATH and enforce managed IPv4 loopback binding. | 2026-08-22 |
 
 ## Proposed plans
 
