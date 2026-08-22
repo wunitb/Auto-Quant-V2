@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ipaddress
 import json
 import os
 import shlex
@@ -178,6 +179,37 @@ def _managed_ports(raw: str | None) -> dict[str, Any]:
     return parsed
 
 
+def _managed_host(raw: str | None) -> str:
+    if raw is None or not raw or raw.strip() != raw:
+        raise AutoQuantValidationError(
+            [
+                _issue(
+                    HARNESS_HOST,
+                    "studio.managed-host",
+                    "Managed Studio requires one non-empty injected host",
+                )
+            ]
+        )
+    if raw.casefold() == "localhost":
+        return raw
+    try:
+        address = ipaddress.ip_address(raw)
+    except ValueError:
+        address = None
+    if isinstance(address, ipaddress.IPv4Address) and address.is_loopback:
+        return raw
+    raise AutoQuantValidationError(
+        [
+            _issue(
+                HARNESS_HOST,
+                "studio.managed-host",
+                "Managed Studio host must be localhost or a canonical IPv4 "
+                "loopback address",
+            )
+        ]
+    )
+
+
 def resolve_studio_launch(
     *,
     host: str | None,
@@ -196,21 +228,7 @@ def resolve_studio_launch(
             managed=False,
         )
 
-    injected_host = environment.get(HARNESS_HOST)
-    if (
-        injected_host is None
-        or not injected_host
-        or injected_host.strip() != injected_host
-    ):
-        raise AutoQuantValidationError(
-            [
-                _issue(
-                    HARNESS_HOST,
-                    "studio.managed-host",
-                    "Managed Studio requires one non-empty injected host",
-                )
-            ]
-        )
+    injected_host = _managed_host(environment.get(HARNESS_HOST))
     ports = _managed_ports(environment.get(HARNESS_PORTS))
     if set(ports) != STUDIO_MANAGED_PORT_NAMES:
         declared = ", ".join(sorted(STUDIO_MANAGED_PORT_NAMES))

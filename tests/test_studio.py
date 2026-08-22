@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import shlex
+import shutil
 import socket
 import subprocess
 import sys
@@ -94,6 +95,62 @@ class StudioObservationTests(unittest.TestCase):
         ):
             environment.pop(name, None)
         return environment
+
+    def _ordinary_parent_environment(self) -> dict[str, str]:
+        environment = self._standalone_environment()
+        excluded = {
+            Path(sys.executable).parent.resolve(),
+            (Path(__file__).resolve().parents[1] / ".venv" / "bin").resolve(),
+        }
+        environment["PATH"] = os.pathsep.join(
+            entry
+            for entry in environment.get("PATH", "").split(os.pathsep)
+            if entry and Path(entry).resolve() not in excluded
+        )
+        environment.pop("VIRTUAL_ENV", None)
+        environment.pop("UV_PROJECT_ENVIRONMENT", None)
+        self.assertIsNotNone(shutil.which("uv", path=environment["PATH"]))
+        return environment
+
+    def _copy_source_workspace(self, directory: str) -> Path:
+        source = Path(__file__).resolve().parents[1]
+        target = Path(directory) / "source-workspace"
+        shutil.copytree(
+            source,
+            target,
+            ignore=shutil.ignore_patterns(
+                ".git",
+                ".venv",
+                ".pytest_cache",
+                ".ruff_cache",
+                "__pycache__",
+                "*.pyc",
+                "autoquant-workspace.local.json",
+                "dist*",
+                "run.log",
+            ),
+        )
+        return target
+
+    def _prepare_source_workspace(
+        self,
+        directory: str,
+    ) -> tuple[Path, dict[str, str]]:
+        workspace = self._copy_source_workspace(directory)
+        environment = self._ordinary_parent_environment()
+        prepared = subprocess.run(
+            ["uv", "sync", "--frozen"],
+            cwd=workspace,
+            env=environment,
+            capture_output=True,
+            check=False,
+            text=True,
+            timeout=120,
+        )
+        self.assertEqual(prepared.returncode, 0, prepared.stderr)
+        self.assertTrue((workspace / ".venv" / "bin" / "aq").is_file())
+        self.assertNotIn(str(workspace / ".venv" / "bin"), environment["PATH"])
+        return workspace, environment
 
     def test_workspace_and_project_snapshots_share_verified_contract(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -726,6 +783,20 @@ class StudioObservationTests(unittest.TestCase):
                 environ=environment,
             )
 
+        for host in ("localhost", "LOCALHOST", "127.0.0.2", "127.255.255.254"):
+            with self.subTest(host=host):
+                accepted = self._managed_environment(49321)
+                accepted["HARNESS_HOST"] = host
+                self.assertEqual(
+                    resolve_studio_launch(
+                        host=None,
+                        port=None,
+                        no_open=False,
+                        environ=accepted,
+                    ).host,
+                    host,
+                )
+
     def test_managed_launch_fails_closed_for_invalid_port_authority(self) -> None:
         invalid_ports = (
             None,
@@ -768,6 +839,36 @@ class StudioObservationTests(unittest.TestCase):
                 },
             )
 
+        for host in (
+            "",
+            " ",
+            " 127.0.0.1",
+            "127.0.0.1 ",
+            "0.0.0.0",
+            "10.0.0.1",
+            "192.0.2.1",
+            "example.com",
+            "localhost.example",
+            "::1",
+            "[::1]",
+            "127.1",
+            "127.000.000.001",
+        ):
+            with self.subTest(host=host), self.assertRaisesRegex(
+                AutoQuantValidationError,
+                "host",
+            ):
+                resolve_studio_launch(
+                    host=None,
+                    port=None,
+                    no_open=False,
+                    environ={
+                        "HARNESS_CAPABILITY": "studio",
+                        "HARNESS_HOST": host,
+                        "HARNESS_PORTS": '{"http":49321}',
+                    },
+                )
+
     def test_non_managed_environment_preserves_standalone_launch(self) -> None:
         noisy_environment = {
             "HARNESS_CAPABILITY": "another-capability",
@@ -786,7 +887,7 @@ class StudioObservationTests(unittest.TestCase):
             environ=noisy_environment,
         )
         explicit = resolve_studio_launch(
-            host="localhost",
+            host="0.0.0.0",
             port=0,
             no_open=True,
             environ=noisy_environment,
@@ -796,7 +897,7 @@ class StudioObservationTests(unittest.TestCase):
         self.assertEqual(default.host, "127.0.0.1")
         self.assertEqual(default.port, 8765)
         self.assertTrue(default.open_browser)
-        self.assertEqual(explicit.host, "localhost")
+        self.assertEqual(explicit.host, "0.0.0.0")
         self.assertEqual(explicit.port, 0)
         self.assertFalse(explicit.open_browser)
 
@@ -867,7 +968,7 @@ class StudioObservationTests(unittest.TestCase):
         self,
     ) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            workspace = initialize_workspace(Path(directory) / "desk")
+            workspace, parent_environment = self._prepare_source_workspace(directory)
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
                 probe.bind(("127.0.0.1", 0))
                 port = probe.getsockname()[1]
@@ -877,13 +978,12 @@ class StudioObservationTests(unittest.TestCase):
                     ("127.0.0.1", 8765)
                 ) != 0
             environment = self._managed_environment(port)
-            environment["PATH"] = (
-                f"{Path(sys.executable).parent}{os.pathsep}"
-                f"{environment.get('PATH', '')}"
-            )
+            environment["PATH"] = parent_environment["PATH"]
+            environment.pop("VIRTUAL_ENV", None)
+            environment.pop("UV_PROJECT_ENVIRONMENT", None)
             process = subprocess.Popen(
                 self._manifest_command(),
-                cwd=workspace.root_dir,
+                cwd=workspace,
                 env=environment,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -958,6 +1058,33 @@ class StudioObservationTests(unittest.TestCase):
                 released.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                 released.bind(("127.0.0.1", port))
 
+    def test_manifest_command_fails_clearly_without_prepared_environment(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = self._copy_source_workspace(directory)
+            parent_environment = self._ordinary_parent_environment()
+            environment = self._managed_environment(49321)
+            environment["PATH"] = parent_environment["PATH"]
+            environment.pop("VIRTUAL_ENV", None)
+            environment.pop("UV_PROJECT_ENVIRONMENT", None)
+            lock_before = (workspace / "uv.lock").read_bytes()
+
+            result = subprocess.run(
+                self._manifest_command(),
+                cwd=workspace,
+                env=environment,
+                capture_output=True,
+                check=False,
+                text=True,
+                timeout=15,
+            )
+
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual(result.stdout, "")
+            self.assertIn("Failed to spawn", result.stderr)
+            self.assertIn("aq", result.stderr)
+            self.assertEqual((workspace / "uv.lock").read_bytes(), lock_before)
+            self.assertFalse((workspace / ".venv" / "bin" / "aq").exists())
+
     def test_managed_no_open_environment_suppresses_real_browser_opener(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             workspace = initialize_workspace(Path(directory) / "desk")
@@ -972,17 +1099,18 @@ class StudioObservationTests(unittest.TestCase):
                 probe.bind(("127.0.0.1", 0))
                 port = probe.getsockname()[1]
             command = [
-                item for item in self._manifest_command() if item != "--no-open"
+                sys.executable,
+                "-m",
+                "autoquant",
+                "studio",
+                "serve",
+                str(workspace.root_dir),
             ]
             environment = self._managed_environment(port)
             environment.update(
                 {
                     "AUTOQUANT_BROWSER_MARKER": str(marker),
                     "BROWSER": str(opener),
-                    "PATH": (
-                        f"{Path(sys.executable).parent}{os.pathsep}"
-                        f"{environment.get('PATH', '')}"
-                    ),
                 }
             )
             process = subprocess.Popen(
@@ -1061,13 +1189,19 @@ class StudioObservationTests(unittest.TestCase):
                 probe.bind(("127.0.0.1", 0))
                 port = probe.getsockname()[1]
             environment = self._managed_environment(port)
-            environment["PATH"] = (
-                f"{Path(sys.executable).parent}{os.pathsep}"
-                f"{environment.get('PATH', '')}"
-            )
             result = subprocess.run(
-                [*self._manifest_command(), "--port", str(port + 1)],
-                cwd=workspace.root_dir,
+                [
+                    sys.executable,
+                    "-m",
+                    "autoquant",
+                    "studio",
+                    "serve",
+                    str(workspace.root_dir),
+                    "--no-open",
+                    "--port",
+                    str(port + 1),
+                ],
+                cwd=Path(__file__).resolve().parents[1],
                 env=environment,
                 capture_output=True,
                 check=False,

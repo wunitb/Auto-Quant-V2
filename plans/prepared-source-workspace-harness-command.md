@@ -69,8 +69,8 @@ in [GitHub issue #2](https://github.com/TraderAlice/Auto-Quant-V2/issues/2).
 
 ## Work
 
-- [ ] Update the manifest argv and strict managed-host resolver.
-- [ ] Replace PATH-assisted subprocess coverage with ordinary-parent-PATH source
+- [x] Update the manifest argv and strict managed-host resolver.
+- [x] Replace PATH-assisted subprocess coverage with ordinary-parent-PATH source
   Workspace acceptance and focused negative cases.
 - [ ] Update durable Studio, CLI, operator, architecture, status, and release
   documentation without expanding README workflow detail.
@@ -93,13 +93,21 @@ in [GitHub issue #2](https://github.com/TraderAlice/Auto-Quant-V2/issues/2).
 
 ## Verification
 
-- Pending.
+- `python -m py_compile autoquant/studio.py tests/test_studio.py tests/test_version.py`
+- `python -m unittest tests.test_studio tests.test_version` — 21 tests passed
+  in 39.765 seconds, including a copied source Workspace prepared with only
+  `uv sync --frozen` and launched through the literal manifest argv under an
+  ordinary parent `PATH`.
 
 ## Progress log
 
 - 2026-08-22 — Reproduced issue #2 from the immutable `v0.9.33` tag, reviewed
   the generic Harness contract and acceptance matrix, and activated this
   fix-forward plan.
+- 2026-08-22 — Replaced the bare manifest executable with frozen, no-sync `uv`
+  environment entry; restricted managed hosts to `localhost` and IPv4 loopback;
+  and added real prepared-source, missing-preparation, host-authority, readiness,
+  embedding, and process-release regressions.
 
 ## Completion
 

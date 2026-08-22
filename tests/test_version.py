@@ -48,6 +48,10 @@ class VersionContractTests(unittest.TestCase):
                 "capabilities": {
                     "studio": {
                         "command": [
+                            "uv",
+                            "run",
+                            "--frozen",
+                            "--no-sync",
                             "aq",
                             "studio",
                             "serve",
