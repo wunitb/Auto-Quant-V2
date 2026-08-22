@@ -1,6 +1,6 @@
 # Generic Harness Web Surface
 
-- Status: `active`
+- Status: `completed`
 - Target release: `0.9.33`
 - Updated: `2026-08-22`
 - Related design: [[docs/design/studio-observation-surface]],
@@ -64,7 +64,7 @@ public origin.
 - [x] Frontend runtime references remain same-origin and no internal bind
   address, cookie, authorization, CSRF, redirect, SSE, or WebSocket dependency
   is introduced.
-- [ ] Focused, documentation, complete source, build/install, and clean-clone
+- [x] Focused, documentation, complete source, build/install, and clean-clone
   release checks pass before `v0.9.33` is tagged at the immutable release SHA.
 
 ## Work
@@ -77,7 +77,7 @@ public origin.
   opaque Host routing and SIGTERM cleanup.
 - [x] Update durable Studio/CLI/operator/architecture/version documentation and
   prepare the patch-version authorities.
-- [ ] Complete the full release audit, installed artifact replay, tag, push,
+- [x] Complete the full release audit, installed artifact replay, tag, push,
   and remote SHA verification.
 
 ## Findings and decisions
@@ -107,8 +107,31 @@ public origin.
 - `uv run python -m unittest discover -s tests -v` passed all 464 tests in
   1,239.939 seconds. The existing bounded RL empty-slice NumPy/Pandas warnings
   were the only warnings; no checked-in Project or immutable Run changed.
-- Build/install, package-closure, clean-clone, and final exact-commit evidence
-  remain pending.
+- Candidate `bbef315431410354ebaf505a404c9aa583cc43cb` built and installed
+  cleanly under Python 3.11.14. The wheel records version `0.9.33`, that exact
+  clean commit, `embedded-distribution`, and runtime source hash
+  `c464af8d4afb2ae7700041c9a67889cb4585d75c2c470a73819a2f6ee62c34fe`.
+- Candidate artifact SHA-256 values are
+  `1e98c3fe5421b2b55008b650f6f02bb23f2ae2425d2c3749c7c14e3d2c715533`
+  for the wheel and
+  `5ac0fa9059c28ed0bb2a8dd85a00fd44f53ec6df7650f5cab491cce77ebe7461`
+  for the sdist. The wheel contains 185 entries, including Studio source and
+  all packaged assets, Project templates, and Workspace Skills required by
+  the public runtime.
+- The installed CLI in a no-hardlink clone with no local Workspace override
+  passed `version`, capability discovery, `orient`, `validate`, Project list,
+  and Studio snapshot checks with the same embedded identity.
+- The installed manifest command served root, CSS, JavaScript, snapshot, and
+  health through `oa-surface-v0933.localhost`, emitted only the restricted
+  managed framing policy, ignored supplied host credentials, exposed no
+  redirect, and released its listener after SIGTERM. Standalone headers
+  retained their exact strict policy. An occupied injected port failed in
+  1.798 seconds without stdout or fallback, and an explicit port conflict
+  failed closed.
+- The completion-only documentation commit is rebuilt and replayed outside the
+  repository before the tag is created; publication proceeds only if that
+  final artifact retains the same runtime hash and all remote branch/tag SHAs
+  agree.
 
 ## Progress log
 
@@ -124,7 +147,16 @@ public origin.
   resolve.
 - 2026-08-22 — The clean complete source audit passed all 464 tests in
   1,239.939 seconds with no sample or immutable-evidence changes.
+- 2026-08-22 — A fresh installed wheel and no-override clone passed runtime
+  closure, identity, Workspace, exact managed Surface, standalone security,
+  occupied-port, conflict, and SIGTERM acceptance.
 
 ## Completion
 
-Pending.
+AutoQuant `0.9.33` ships one vendor-neutral Harness v1 Studio capability. It
+accepts only exact generic managed authority, remains current-origin and
+foreground-owned, relaxes framing only to the fixed managed ancestor allowlist,
+and preserves standalone launch and anti-frame security. No OpenAlice SDK,
+host-specific manifest field, public-origin/base-path protocol, proxy, UI
+change, SSE, WebSocket, research-semantic change, or fixture rewrite was added.
+The separately proposed tiered-test feedback work remains targeted to `0.9.34`.
