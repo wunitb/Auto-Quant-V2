@@ -72,7 +72,7 @@ in [GitHub issue #2](https://github.com/TraderAlice/Auto-Quant-V2/issues/2).
 - [x] Update the manifest argv and strict managed-host resolver.
 - [x] Replace PATH-assisted subprocess coverage with ordinary-parent-PATH source
   Workspace acceptance and focused negative cases.
-- [ ] Update durable Studio, CLI, operator, architecture, status, and release
+- [x] Update durable Studio, CLI, operator, architecture, status, and release
   documentation without expanding README workflow detail.
 - [ ] Complete the full release and installed-artifact audit, publish the tag,
   verify remote parity, and close issue #2 with exact evidence.
@@ -98,6 +98,7 @@ in [GitHub issue #2](https://github.com/TraderAlice/Auto-Quant-V2/issues/2).
   in 39.765 seconds, including a copied source Workspace prepared with only
   `uv sync --frozen` and launched through the literal manifest argv under an
   ordinary parent `PATH`.
+- `python scripts/check_doc_links.py` — all 1,571 documentation links resolve.
 
 ## Progress log
 
@@ -108,6 +109,10 @@ in [GitHub issue #2](https://github.com/TraderAlice/Auto-Quant-V2/issues/2).
   environment entry; restricted managed hosts to `localhost` and IPv4 loopback;
   and added real prepared-source, missing-preparation, host-authority, readiness,
   embedding, and process-release regressions.
+- 2026-08-22 — Documented AutoQuant-owned source preparation, literal
+  supervisor execution, managed host authority, and unchanged standalone
+  behavior across the Studio, CLI, operator, architecture, and product-model
+  contracts.
 
 ## Completion
 

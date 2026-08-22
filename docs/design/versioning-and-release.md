@@ -72,6 +72,11 @@ it has deliberately selected; publishing a newer repository tag does not move
 that pin, rewrite a desk, or migrate Project state. Record the current host pin
 in `docs/STATUS.md`, not as a package-side upgrade action.
 
+A source-Workspace host prepares the selected tag with AutoQuant's documented
+`uv sync --frozen` command. Capability startup must execute the checked-in
+manifest literally under an ordinary parent `PATH`; the supervisor does not
+activate `.venv`, install dependencies, or rewrite the manifest command.
+
 ## Release evidence
 
 The active plan owns the live release checklist and exact verification output.

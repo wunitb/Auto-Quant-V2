@@ -47,6 +47,12 @@ the desk. It does not create a separate AutoQuant mode or own quantitative
 truth. The canonical product model is
 [[docs/design/agent-native-quant-workbench]].
 
+The source Workspace owns its runtime preparation through `uv sync --frozen`.
+`harness.json` enters that prepared environment with frozen, no-sync `uv run`
+and accepts only explicit loopback process authority from a supervisor. Hosting
+does not require virtual-environment activation, `PATH` mutation, launch-time
+dependency installation, or changes to standalone CLI behavior.
+
 ## Current implementation state
 
 The V2 foundation now implements:

@@ -29,7 +29,7 @@ teaching Project:
 ```bash
 git clone git@github.com:TraderAlice/Auto-Quant-V2.git
 cd Auto-Quant-V2
-uv sync
+uv sync --frozen
 
 uv run aq --version
 uv run aq project list .
@@ -252,6 +252,10 @@ foreground, uses only the injected endpoint, suppresses browser opening, and
 permits only the restricted Harness embedding origins. AutoQuant still owns
 the HTTP process and read model; the host owns public routing and product
 chrome. Standalone launch and its strict anti-frame policy remain unchanged.
+The source Workspace must first be prepared by AutoQuant's ordinary
+`uv sync --frozen` setup. The manifest then enters that prepared environment
+with `uv run --frozen --no-sync`; a supervisor neither activates `.venv` nor
+installs dependencies during capability launch.
 
 ## Where to continue
 

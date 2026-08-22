@@ -1339,11 +1339,15 @@ explicit operator choice and V1 has no authentication.
 When `HARNESS_CAPABILITY=studio`, the command enters strict Harness-managed
 launch. It requires `HARNESS_HOST` and JSON `HARNESS_PORTS` with exactly the
 manifest-declared names—currently one integer `http` port in `1..65535`—binds
-that exact endpoint, and fails instead of finding another port. Missing or
-extra names and conflicting explicit `--host`/`--port` values are invalid,
-while equal repetitions are allowed. `HARNESS_NO_OPEN=1` forces no-browser
-operation. Other capability values do not alter standalone defaults, flags,
-or response security. See
+that exact endpoint, and fails instead of finding another port. Managed hosts
+are limited to `localhost` or canonical IPv4 `127/8` literals. Missing or extra
+port names, unsupported hosts, and conflicting explicit `--host`/`--port`
+values are invalid, while equal repetitions are allowed.
+`HARNESS_NO_OPEN=1` forces no-browser operation. The manifest command is
+`uv run --frozen --no-sync aq studio serve . --no-open`: first prepare the
+source Workspace with `uv sync --frozen`; launch itself never synchronizes
+dependencies. Other capability values do not alter standalone defaults,
+flags, or response security. See
 [[docs/STUDIO]].
 
 ## Success envelope
@@ -1442,7 +1446,7 @@ error envelope. Human errors are written to stderr.
 The repository installs the command as a Python project:
 
 ```bash
-uv sync
+uv sync --frozen
 uv run aq capabilities --json
 ```
 

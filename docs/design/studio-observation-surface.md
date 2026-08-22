@@ -123,19 +123,27 @@ operator choice and V1 has no authentication.
 
 The repository-root `harness.json` is the host discovery surface. Its manifest
 protocol version is distinct from the AutoQuant product version. The one
-declared `studio` capability executes the ordinary `aq studio serve .
---no-open` command from the Workspace root, requests a named `http` port, and
-uses `/api/v1/health` for readiness. That route returns HTTP 200 only after the
-server is listening and identifies `service: autoquant-studio`.
+declared `studio` capability executes `uv run --frozen --no-sync aq studio
+serve . --no-open` from the Workspace root, requests a named `http` port, and
+uses `/api/v1/health` for readiness. The source Workspace is independently
+prepared with `uv sync --frozen`; capability launch selects that owned
+environment without activating `.venv`, changing `PATH`, modifying the lock,
+or synchronizing dependencies. Missing preparation is an explicit startup
+failure. The health route returns HTTP 200 only after the server is listening
+and identifies `service: autoquant-studio`.
 
 `HARNESS_CAPABILITY=studio` alone activates managed launch resolution. In that
 mode, `HARNESS_HOST` is required and `HARNESS_PORTS` must be an unambiguous
 JSON object whose names match the manifest exactly: one integer `http` value
-in `1..65535`, with no missing or extra name. AutoQuant binds exactly that host
-and port. It never probes or increments another port. An explicitly supplied
-`--host` or `--port` may repeat injected authority but cannot conflict with it.
-Port bind failure remains a process startup failure. `HARNESS_NO_OPEN=1`
-forces browser suppression.
+in `1..65535`, with no missing or extra name. The injected host must be exact
+`localhost` (case-insensitive) or a canonical IPv4 loopback literal in
+`127.0.0.0/8`. Wildcard, interface/public, arbitrary hostname, IPv6,
+whitespace, and malformed authority fail before server construction.
+AutoQuant binds exactly the accepted host and port. It never probes or
+increments another port. An explicitly supplied `--host` or `--port` may
+repeat injected authority but cannot conflict with it. Port bind failure
+remains a process startup failure. `HARNESS_NO_OPEN=1` forces browser
+suppression.
 
 The resolved `managed` state is passed explicitly from launch resolution
 through CLI, server construction, and response-header generation. Managed

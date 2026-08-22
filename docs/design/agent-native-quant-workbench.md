@@ -50,6 +50,13 @@ policy. The host still owns public origin and routing. This is launch authority
 around the same Studio server, not a hosted research Core, private API, or
 second product edition.
 
+Environment ownership remains with AutoQuant. A source Workspace is prepared
+through its documented `uv sync --frozen` setup, and the manifest enters that
+prepared environment through frozen, no-sync `uv run`. A host supplies only
+bounded process authority such as loopback host, named port, and browser
+suppression; it does not activate AutoQuant's virtual environment or install
+its dependencies at launch.
+
 The product model is no longer supported only by reference fixtures.
 AutoQuant `0.8.8` has completed materially different real-request field trials
 covering Factor, Portfolio, governed RL, multi-interval Crypto, mixed-class

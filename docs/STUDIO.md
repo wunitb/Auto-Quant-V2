@@ -50,7 +50,7 @@ HARNESS_CAPABILITY=studio \
 HARNESS_HOST=127.0.0.1 \
 HARNESS_PORTS='{"http":49321}' \
 HARNESS_NO_OPEN=1 \
-aq studio serve . --no-open
+uv run --frozen --no-sync aq studio serve . --no-open
 ```
 
 After the URL announcement, readiness is:
@@ -62,11 +62,20 @@ curl --fail http://127.0.0.1:49321/api/v1/health
 Managed mode binds exactly the injected host and `http` port. Missing,
 malformed, non-integer, boolean, zero, or out-of-range port authority fails
 before listening. Missing or extra port names fail because `HARNESS_PORTS` must
-match the manifest exactly. An occupied port also fails; AutoQuant never
-selects a replacement. Explicit `--host` or `--port` values must equal their
-injected values. Outside exact `HARNESS_CAPABILITY=studio` mode, these
+match the manifest exactly. The host must be `localhost` or a canonical IPv4
+loopback literal in `127.0.0.0/8`; wildcard, interface/public, arbitrary-name,
+IPv6, whitespace, and malformed authorities fail before server construction.
+An occupied port also fails; AutoQuant never selects a replacement. Explicit
+`--host` or `--port` values must equal their injected values. Outside exact
+`HARNESS_CAPABILITY=studio` mode, these
 environment variables do not affect standalone behavior. Older
 vendor-specific environment names are not managed-launch aliases.
+
+The checked-in command assumes the source Workspace was independently prepared
+with `uv sync --frozen`. It uses `uv run --frozen --no-sync` so capability
+startup selects the repository-owned environment but cannot modify the lock or
+synchronize dependencies. Missing preparation is a startup error; the
+supervisor does not activate `.venv`, alter `PATH`, or repair the installation.
 
 Standalone responses retain `frame-ancestors 'none'`,
 `X-Frame-Options: DENY`, and same-origin resource policy. Managed responses
