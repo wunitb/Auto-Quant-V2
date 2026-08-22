@@ -1,10 +1,10 @@
 # AutoQuant V2 current status
 
-Status: `v0.9.32` is the current AutoQuant release and `v0.8.31`
+Status: `v0.9.33` is the current AutoQuant release and `v0.8.31`
 remains the Harness currently consumed by OpenAlice until the host deliberately
 selects a newer tag.
 
-Updated: 2026-08-21.
+Updated: 2026-08-22.
 
 Related: [[README]], [[docs/CHANGELOG]], [[docs/ARCHITECTURE]],
 [[docs/design/agent-native-quant-workbench]],
@@ -17,39 +17,38 @@ historical proof remains in completed plans and immutable Git tags.
 
 ## Current milestone
 
-The `0.9.32` release exposes the existing read-only Studio through the standard
-repository-root Harness capability manifest. A host discovers one `studio`
-command, allocates its named `http` port, starts the ordinary public CLI from
-the Workspace root, and waits on the existing `/api/v1/health` route. No
-OpenAlice SDK, private process protocol, alternate Server, or UI path exists.
+The `0.9.33` release makes the existing manifest v1 Studio capability usable
+by OpenAlice or another compatible Harness supervisor without creating a
+host-specific product edition. Exact `HARNESS_CAPABILITY=studio` mode requires
+a non-empty `HARNESS_HOST` and an unambiguous `HARNESS_PORTS` object whose names
+match the manifest exactly: one integer `http` value in `1..65535`. Studio
+binds only that endpoint. Missing, malformed, incomplete, extra, conflicting,
+or occupied authority fails instead of scanning, incrementing, or falling
+back. `HARNESS_NO_OPEN=1` suppresses the browser.
 
-Exact `OPENALICE_CAPABILITY=studio` mode now requires a non-empty injected
-host and an unambiguous JSON ports object with integer `http` in `1..65535`.
-Studio binds only that endpoint. Missing or malformed authority, explicit
-host/port conflicts, and occupied ports fail the process instead of silently
-falling back. Host no-open authority suppresses the browser. Without that exact
-capability marker, OpenAlice variables are ignored and standalone Studio keeps
-its `127.0.0.1:8765`, explicit flag, browser, and port-zero behavior.
+Managed state is explicit from launch resolution through HTTP response policy.
+Only managed responses omit `X-Frame-Options` and same-origin resource policy;
+their CSP admits `app:`, loopback HTTP, `localhost`, and localhost subdomains
+as frame ancestors but never a universal wildcard. Standalone Studio retains
+its `127.0.0.1:8765`, explicit flags, browser behavior, port-zero support,
+`frame-ancestors 'none'`, `X-Frame-Options: DENY`, and same-origin resource
+policy. Vendor-specific environment names have no launch authority.
 
-The health response remains AutoQuant-owned read-only HTTP and identifies
-`service: autoquant-studio` after listening. Focused tests launch a real
-subprocess on a test-assigned loopback port, probe readiness, hold an injected
-port occupied, verify browser suppression through the CLI boundary, and cover
-invalid JSON, missing `http`, booleans, non-integers, bounds, duplicate keys,
-and argument conflicts. Exact release proof accumulates in
-[[plans/openalice-harness-studio-capability]].
+The page, packaged assets, health/snapshot APIs, and polling remain
+current-origin HTTP. Studio does not consume host Cookie, Authorization, or
+CSRF state and does not redirect to its injected bind address. It currently
+has no SSE or WebSocket transport. Focused source tests cover the complete
+manifest, launch, security-header, opaque Host, browser, occupied-port,
+conflict, readiness, and SIGTERM contract. Exact release proof accumulates in
+[[plans/generic-harness-web-surface]].
 
 The root sample preserves all seventeen prior Runs byte-for-byte and adds two
 clean-commit candidate Runs proving current Factor and Portfolio projections
 under the separated authorities. It now contains nineteen immutable Runs and
 no governed-RL baseline. OpenAlice remains independently pinned to `v0.8.31`.
 
-The complete source regression passes all 460 tests in 1,161.458 seconds.
-Lock consistency, Python compilation, Studio JavaScript syntax, diff hygiene,
-and all 1,562 current documentation links also pass. Clean build/install,
-package closure, no-override clone, exact managed-Studio health, occupied-port,
-argument-conflict, and standalone-isolation replays pass; exact proof is in
-[[plans/openalice-harness-studio-capability]].
+The complete `0.9.33` source and installed-distribution release audit is
+recorded in [[plans/generic-harness-web-surface]].
 
 ## What works today
 

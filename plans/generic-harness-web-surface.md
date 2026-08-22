@@ -50,18 +50,18 @@ public origin.
 
 ## Acceptance
 
-- [ ] `harness.json` remains manifest v1, declares only `studio.http`, and its
+- [x] `harness.json` remains manifest v1, declares only `studio.http`, and its
   version agrees with every `0.9.33` product-version authority.
-- [ ] Exact `HARNESS_CAPABILITY=studio` launch is fail-closed, binds only the
+- [x] Exact `HARNESS_CAPABILITY=studio` launch is fail-closed, binds only the
   injected host/port, suppresses browser opening when directed, and rejects
   incomplete, extra, invalid, conflicting, or occupied authority.
-- [ ] Managed HTTP responses omit X-Frame-Options and same-origin CORP and use
+- [x] Managed HTTP responses omit X-Frame-Options and same-origin CORP and use
   only the required restricted `frame-ancestors`; standalone responses retain
   all prior strict headers.
-- [ ] A real manifest-command subprocess serves root, assets, health, and
+- [x] A real manifest-command subprocess serves root, assets, health, and
   snapshot APIs under an opaque localhost Host, reaches truthful readiness,
   takes no fallback port, and releases its process and port after SIGTERM.
-- [ ] Frontend runtime references remain same-origin and no internal bind
+- [x] Frontend runtime references remain same-origin and no internal bind
   address, cookie, authorization, CSRF, redirect, SSE, or WebSocket dependency
   is introduced.
 - [ ] Focused, documentation, complete source, build/install, and clean-clone
@@ -75,7 +75,7 @@ public origin.
   explicitly through CLI, server creation, and request handling.
 - [x] Add bounded unit and real-subprocess acceptance coverage, including
   opaque Host routing and SIGTERM cleanup.
-- [ ] Update durable Studio/CLI/operator/architecture/version documentation and
+- [x] Update durable Studio/CLI/operator/architecture/version documentation and
   prepare the patch-version authorities.
 - [ ] Complete the full release audit, installed artifact replay, tag, push,
   and remote SHA verification.
@@ -108,6 +108,10 @@ public origin.
 - 2026-08-22 — Implemented generic launch authority, explicit mode-specific
   response policies, and real foreground-process tests. All 20 Studio/version
   focused tests pass in 16.654 seconds.
+- 2026-08-22 — Prepared all `0.9.33` version authorities and durable operator,
+  CLI, architecture, and Studio contract documentation. The versioned focused
+  replay passes 20 tests in 17.775 seconds and all 1,567 documentation links
+  resolve.
 
 ## Completion
 
