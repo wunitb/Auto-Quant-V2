@@ -20,6 +20,7 @@ invariants live in `docs/design/`.
 
 | Plan | Outcome | Updated |
 | --- | --- | --- |
+| [[plans/studio-readable-type-scale]] | Make Studio reports and quantitative evidence readable at 100% zoom without enlarging already-correct headings. | 2026-09-03 |
 
 ## Proposed plans
 

@@ -195,6 +195,29 @@ through the long evidence surface. It supports keyboard focus, narrow screens,
 reduced motion, empty Projects, invalid evidence diagnostics, manual refresh,
 and bounded automatic refresh.
 
+### Readable evidence typography
+
+Density must come from layout, grouping, alignment, and disclosure—not from
+text too small to inspect at 100% browser zoom. Studio owns four compact text
+roles:
+
+| Role | Size | Use |
+| --- | --- | --- |
+| micro | 10px | short uppercase labels, chart axes, and status marks |
+| metadata | 11px | identifiers, timestamps, commands, and secondary facts |
+| data | 12px with 16px rows | table values, proof blocks, and quantitative readouts |
+| body | 13px with 20px lines | report summaries, explanations, warnings, and decisions |
+
+Report prose never uses micro or metadata roles. Table rows use the data role;
+headers and short auxiliary labels may use micro or metadata but never render
+below 10px. Existing display and section-heading sizes remain separate from
+this floor because they already establish the correct hierarchy.
+
+Narrow layouts preserve these roles. A wide evidence table must retain its
+owned horizontal scroll or switch to the existing labelled-card projection; it
+must not fit by shrinking text. A surrounding Harness may offer iframe zoom,
+but Studio remains readable at 100% and never depends on host CSS injection.
+
 Before a delegated Session exists, the first viewport prioritizes mandate,
 requested assets versus research universe, dataset authority, immutable
 baseline evidence, and the exact next headless action. Generic object counts

@@ -1,10 +1,9 @@
 # AutoQuant V2 current status
 
-Status: `v0.9.34` is the current AutoQuant release and `v0.8.31`
-remains the Harness currently consumed by OpenAlice until the host deliberately
-selects a newer tag.
+Status: `v0.9.35` is the current AutoQuant release. Host version selection
+remains independent and must move deliberately to the matching immutable tag.
 
-Updated: 2026-08-22.
+Updated: 2026-09-03.
 
 Related: [[README]], [[docs/CHANGELOG]], [[docs/ARCHITECTURE]],
 [[docs/design/agent-native-quant-workbench]],
@@ -17,49 +16,31 @@ historical proof remains in completed plans and immutable Git tags.
 
 ## Current milestone
 
-The `0.9.34` release fixes the prepared source-Workspace launch boundary found
-by real `0.9.33` host acceptance. A clone prepared independently with
-`uv sync --frozen` can run every standalone `uv run aq ...` route, while the
-literal manifest command uses `uv run --frozen --no-sync` to select that same
-repository-owned environment under an ordinary supervisor `PATH`. Capability
-launch cannot update the lock or synchronize dependencies, and missing
-preparation fails explicitly instead of asking the host to repair AutoQuant.
+The `0.9.35` release makes the read-only Studio legible at 100% browser zoom.
+Report summaries, explanations, warnings, and decision copy use a 13px/20px
+body role. Quantitative tables and proof blocks use a 12px/16px data role.
+Identifiers and compact metadata use 11px, while short labels, chart axes, and
+status marks have a hard 10px floor. Existing display and section headings
+remain unchanged.
 
-Exact `HARNESS_CAPABILITY=studio` mode now accepts only `localhost` or canonical
-IPv4 loopback literals in `127/8`, plus an unambiguous `HARNESS_PORTS` object
-whose names match the manifest exactly: one integer `http` value in
-`1..65535`. Wildcard, interface/public, arbitrary hostname, IPv6, whitespace,
-malformed, incomplete, extra, conflicting, or occupied authority fails before
-listening. Studio never scans, increments, or falls back.
-`HARNESS_NO_OPEN=1` suppresses the browser.
+Narrow layouts retain those roles and use owned table scrolling or the existing
+labelled-card projections instead of shrinking text. OpenAlice and other
+Harnesses may still offer iframe zoom, but Studio does not depend on host CSS
+injection. The change affects presentation only: snapshot schemas, evidence,
+research authority, and immutable Run/Report identities are unchanged.
 
-Managed state is explicit from launch resolution through HTTP response policy.
-Only managed responses omit `X-Frame-Options` and same-origin resource policy;
-their CSP admits `app:`, loopback HTTP, `localhost`, and localhost subdomains
-as frame ancestors but never a universal wildcard. Standalone Studio retains
-its `127.0.0.1:8765`, explicit flags, browser behavior, port-zero support,
-`frame-ancestors 'none'`, `X-Frame-Options: DENY`, and same-origin resource
-policy. Vendor-specific environment names have no launch authority.
+The release retains the `0.9.34` prepared source-Workspace and managed Harness
+launch boundary. A clone prepared with `uv sync --frozen` runs the literal
+`uv run --frozen --no-sync` capability command under an ordinary supervisor
+PATH. Managed bind authority remains restricted to explicit loopback hosts and
+one manifest-matched port, with standalone anti-frame policy unchanged.
 
-The page, packaged assets, health/snapshot APIs, and polling remain
-current-origin HTTP. Studio does not consume host Cookie, Authorization, or
-CSRF state and does not redirect to its injected bind address. It currently
-has no SSE or WebSocket transport. Focused source tests cover the complete
-manifest, launch, security-header, opaque Host, browser, occupied-port,
-conflict, readiness, and SIGTERM contract. Exact release proof accumulates in
-[[plans/prepared-source-workspace-harness-command]].
-
-The root sample preserves all seventeen prior Runs byte-for-byte and adds two
-clean-commit candidate Runs proving current Factor and Portfolio projections
-under the separated authorities. It now contains nineteen immutable Runs and
-no governed-RL baseline. OpenAlice remains independently pinned to `v0.8.31`.
-
-The complete source regression passes all 465 tests in 1,165.336 seconds.
-Lock consistency, Python compilation, Studio JavaScript syntax, diff hygiene,
-and all 1,572 current documentation links also pass. Clean build/install,
-package closure, no-override clone, literal-manifest managed health/security,
-standalone isolation, and immutable tag evidence are recorded in
-[[plans/prepared-source-workspace-harness-command]].
+The root sample still contains nineteen immutable Runs and no governed-RL
+baseline. The exact-state source regression passes all 470 tests in 883.218
+seconds; lock consistency, Python compilation, Studio JavaScript syntax, all
+1,574 documentation links, source/wheel builds, and a fresh Python 3.11
+installed-wheel smoke also pass. Exact implementation, browser, suite, build,
+and release evidence is recorded in [[plans/studio-readable-type-scale]].
 
 ## What works today
 
@@ -162,8 +143,6 @@ AutoQuant evidence without moving live-trading authority into the quant desk.
   materialization route without turning Core into a downloader.
 - Studio is a verified observation surface, not a full interactive research
   authoring or orchestration UI.
-- OpenAlice remains deliberately pinned to `0.8.31`; host-side adoption of a
-  later release is independent of package publication.
 - Fixed Studies, Session Reports, and multi-lane Dossiers do not collapse into
   one universal outward-deliverable type.
 
