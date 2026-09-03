@@ -22,6 +22,7 @@ It is deliberately not a second current-status page or release checklist:
 
 | Release | Bounded outcome | Exact evidence |
 | --- | --- | --- |
+| `v0.9.35` | Made Studio reports and quantitative evidence readable at 100% zoom with explicit body, data, metadata, and micro roles while preserving heading hierarchy. | [[plans/studio-readable-type-scale]] |
 | `v0.9.34` | Made the checked-in Studio capability executable from an independently prepared source Workspace and restricted managed binds to supported loopback authority. | [[plans/prepared-source-workspace-harness-command]] |
 | `v0.9.33` | Made the Studio capability vendor-neutral, manifest-exact, origin-neutral, and restrictively embeddable only under explicit Harness supervision. | [[plans/generic-harness-web-surface]] |
 | `v0.9.32` | Added standard Harness discovery and strict host-assigned fixed-port launch for the existing Studio while preserving standalone behavior. | [[plans/openalice-harness-studio-capability]] |
