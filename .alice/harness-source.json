@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "template": "auto-quant-v2",
+  "repository": "https://github.com/wunitb/Auto-Quant-V2.git",
+  "version": "v0.9.35",
+  "commit": "b569611c3f927172741fd0915437aedfdae64178"
+}
