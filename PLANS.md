@@ -38,6 +38,7 @@ invariants live in `docs/design/`.
 
 | Plan | Outcome | Updated |
 | --- | --- | --- |
+| [[plans/report-scaffolding-language]] | Render report scaffolding in the declared English or Thai analysis language without changing historical artifacts. | 2026-09-13 |
 | [[plans/prepared-source-workspace-harness-command]] | Made the checked-in Studio command executable from an independently prepared source Workspace under an ordinary supervisor PATH and enforced supported managed IPv4 loopback authority. | 2026-08-22 |
 | [[plans/generic-harness-web-surface]] | Made Studio a vendor-neutral, strictly supervised, origin-neutral, managed-only embeddable Harness Web Surface without weakening standalone security. | 2026-08-22 |
 | [[plans/openalice-harness-studio-capability]] | Let OpenAlice discover and launch the existing Studio on one host-assigned fixed loopback port without changing standalone operation. | 2026-08-21 |

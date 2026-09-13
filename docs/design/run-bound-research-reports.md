@@ -84,6 +84,26 @@ finding until the Agent replaces the prose and deliberately sets
 remain readable. The draft itself is mutable authoring material, not an
 immutable Report or research result.
 
+## Authored language and report scaffolding
+
+Report analysis accepts an optional `language`: `en` (English) or `th` (Thai).
+Unsupported values, including explicit null, fail validation. Omission means
+English rendering and remains omitted in normalized analysis, preserving
+historical hashes and Markdown bytes. The schema version does not change.
+
+The Session report renderer in `autoquant/reports.py` uses this declaration for
+section headings, field labels, the full authority warning, and authoring/handoff
+scaffolding. It translates only fixed renderer text before inserting values.
+Authored prose, request content, confidence enums, finding ids, evidence refs,
+metric names, numbers, units, and shared scientific evidence projections retain
+their original contents. No language inference, automatic prose translation,
+historical rewrite, or migration occurs. Direct Run and Dossier rendering are
+outside this rendering change.
+
+`tests/test_thai_reports.py` pins original English rendering bytes, Thai
+scaffolding and publication round-tripping, validation/schema parity, machine
+evidence preservation, and earlier published artifact immutability.
+
 ## Run anchor authority
 
 `aq report publish <path> --study ID --run ID --analysis FILE` requires:

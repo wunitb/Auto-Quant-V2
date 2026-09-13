@@ -51,6 +51,7 @@ REPORT_MARKDOWN = "report.md"
 REPORT_MANIFEST = "manifest.json"
 REPORT_ANALYSIS_KIND = "autoquant-research-report-analysis"
 REPORT_ANALYSIS_AUTHORING_STATES = {"draft", "final"}
+REPORT_ANALYSIS_LANGUAGES = ("en", "th")
 REPORT_DRAFT_FINDING_ID = "draft-replace-with-evidence-backed-finding"
 REPORT_KIND = "autoquant-research-report"
 REPORT_ID = re.compile(
@@ -302,7 +303,7 @@ def validate_report_analysis(
         value,
         required,
         path,
-        optional={"authoringState"},
+        optional={"authoringState", "language"},
     )
     if value.get("schemaVersion") != SCHEMA_VERSION:
         issues.append(_issue(f"{path}/schemaVersion", "schema.version", "Expected V1"))
@@ -316,6 +317,14 @@ def validate_report_analysis(
         )
     for key in ("title", "executiveSummary"):
         issues.extend(_non_empty(value.get(key), f"{path}/{key}"))
+    if value.get("language", "en") not in REPORT_ANALYSIS_LANGUAGES:
+        issues.append(
+            _issue(
+                f"{path}/language",
+                "schema.choice",
+                "language must be en (English) or th (Thai) when declared",
+            )
+        )
     authoring_state = value.get("authoringState")
     if (
         authoring_state is not None
@@ -486,6 +495,8 @@ def validate_report_analysis(
             item.strip() for item in value["unresolvedQuestions"]
         ],
     }
+    if "language" in value:
+        normalized["language"] = value["language"]
     if authoring_state is not None:
         normalized["authoringState"] = authoring_state
     return normalized
@@ -800,9 +811,70 @@ def _evidence_label(reference: dict[str, Any]) -> str:
     return f"`{label}`"
 
 
+# Report-owned scaffolding only; evidence projections retain their own contracts.
+_REPORT_THAI_TEXT = {
+    "## Research request": "## โจทย์วิจัย",
+    "## Executive summary": "## สรุปสำหรับผู้บริหาร",
+    "## Evidence state": "## สถานะหลักฐาน",
+    "## Portfolio mandate": "## ข้อกำหนดพอร์ต",
+    "## Frozen leader-Run Factor input availability": "## ความพร้อมของข้อมูล Factor จาก Run ผู้นำที่ตรึงไว้",
+    "## Frozen leader-Run factor qualification": "## ผลการประเมินคุณสมบัติ Factor จาก Run ผู้นำที่ตรึงไว้",
+    "## Frozen leader-Run factor components": "## องค์ประกอบ Factor จาก Run ผู้นำที่ตรึงไว้",
+    "## Frozen leader-Run mechanical decision": "## การตัดสินใจตามกฎจาก Run ผู้นำที่ตรึงไว้",
+    "## Frozen leader-Run position sizing anatomy": "## รายละเอียดการกำหนดขนาดสถานะจาก Run ผู้นำที่ตรึงไว้",
+    "## Frozen leader-Run diversification stress": "## การทดสอบภาวะกดดันด้านการกระจายความเสี่ยงจาก Run ผู้นำที่ตรึงไว้",
+    "## Frozen leader-Run strategy viability": "## ความเป็นไปได้ในการใช้กลยุทธ์จาก Run ผู้นำที่ตรึงไว้",
+    "## Frozen leader-Run signal monetization bridge": "## การแปลงสัญญาณเป็นผลตอบแทนจาก Run ผู้นำที่ตรึงไว้",
+    "## Frozen leader-Run RL factor-fusion diagnosis": "## ผลวิเคราะห์การผสาน Factor ของ RL จาก Run ผู้นำที่ตรึงไว้",
+    "## RL policy behavior and rationale": "## พฤติกรรมและเหตุผลของนโยบาย RL",
+    "## RL simple-policy challenger": "## นโยบายแบบง่ายสำหรับเปรียบเทียบกับ RL",
+    "## RL incremental value attribution": "## ที่มาของมูลค่าเพิ่มจาก RL",
+    "## RL one-step factor opportunity": "## โอกาสจาก Factor ในหนึ่งขั้นของ RL",
+    "## Research selection integrity": "## ความน่าเชื่อถือของกระบวนการคัดเลือกงานวิจัย",
+    "## Findings": "## ข้อค้นพบ",
+    "## Recommendations": "## ข้อเสนอแนะ",
+    "## Limitations": "## ข้อจำกัด",
+    "## Unresolved questions": "## คำถามที่ยังไม่มีข้อยุติ",
+    "## Reproducibility and handoff": "## การทำซ้ำและส่งต่องาน",
+    "**Question:**": "**คำถาม:**",
+    "**Decision context:**": "**บริบทการตัดสินใจ:**",
+    "**Assets:**": "**สินทรัพย์:**",
+    "**Direction / horizon:**": "**ทิศทาง / กรอบเวลา:**",
+    "**Numerical forward horizon:**": "**ระยะคาดการณ์ล่วงหน้าเชิงตัวเลข:**",
+    "**Caller-supplied source:**": "**แหล่งที่มาที่ผู้ขอระบุ:**",
+    (
+        "> Authority: quantitative decision support only. This report is not a\n"
+        "> trade order, broker confirmation, or authenticated OpenAlice origin."
+    ): (
+        "> ขอบเขตอำนาจ: ใช้เป็นข้อมูลเชิงปริมาณประกอบการตัดสินใจเท่านั้น "
+        "รายงานนี้ไม่ใช่คำสั่งซื้อขาย\n"
+        "> ไม่ใช่คำยืนยันจากโบรกเกอร์ และไม่ได้รับการยืนยันว่ามีต้นทางจาก OpenAlice"
+    ),
+    "Confidence:": "ระดับความเชื่อมั่น:",
+    "Evidence:": "หลักฐาน:",
+    "   Conditions: ": "   เงื่อนไข: ",
+    "none declared": "ไม่ได้ระบุ",
+    "No action recommendation was made.": "ไม่มีข้อเสนอแนะให้ดำเนินการ",
+    "- No additional limitations were declared.": "- ไม่ได้ระบุข้อจำกัดเพิ่มเติม",
+    "- No unresolved questions were declared.": "- ไม่ได้ระบุคำถามที่ยังไม่มีข้อยุติ",
+    (
+        "Publish this exact Markdown through OpenAlice Inbox to let OpenAlice\n"
+        "stamp authoritative Workspace, Session, and document-revision provenance."
+    ): (
+        "เผยแพร่ Markdown ฉบับนี้โดยไม่แก้ไขผ่าน OpenAlice Inbox เพื่อให้ OpenAlice\n"
+        "รับรองข้อมูลที่มาของ Workspace, Session และ revision ของเอกสาร"
+    ),
+}
+
+
 def _render_markdown(report: dict[str, Any]) -> str:
     request = report["request"]
     analysis = report["analysis"]
+    language = analysis.get("language", "en")
+
+    def text(english: str) -> str:
+        return english if language == "en" else _REPORT_THAI_TEXT[english]
+
     evidence = report["evidence"]
     baseline = evidence["session"]["baseline"]
     leader = evidence["session"]["leader"]
@@ -831,21 +903,23 @@ def _render_markdown(report: dict[str, Any]) -> str:
     lines = [
         f"# {analysis['title']}",
         "",
-        "> Authority: quantitative decision support only. This report is not a",
-        "> trade order, broker confirmation, or authenticated OpenAlice origin.",
+        text(
+            "> Authority: quantitative decision support only. This report is not a\n"
+            "> trade order, broker confirmation, or authenticated OpenAlice origin."
+        ),
         "",
-        "## Research request",
+        text("## Research request"),
         "",
-        f"**Question:** {request['question']}",
+        f"{text('**Question:**')} {request['question']}",
         "",
-        f"**Decision context:** {request['decisionContext']}",
+        f"{text('**Decision context:**')} {request['decisionContext']}",
         "",
-        f"**Assets:** {assets}",
+        f"{text('**Assets:**')} {assets}",
         "",
-        f"**Direction / horizon:** {request['direction']} / {request['horizon']}",
+        f"{text('**Direction / horizon:**')} {request['direction']} / {request['horizon']}",
         "",
         (
-            "**Numerical forward horizon:** "
+            f"{text('**Numerical forward horizon:**')} "
             f"primary `{research_horizon['primaryForwardBars']}` decision "
             "bars; diagnostics "
             + ", ".join(
@@ -854,16 +928,16 @@ def _render_markdown(report: dict[str, Any]) -> str:
             )
             + f" bars (`{research_horizon['source']['horizonPolicy']}`)"
             if isinstance(research_horizon, dict)
-            else "**Numerical forward horizon:** unavailable"
+            else f"{text('**Numerical forward horizon:**')} unavailable"
         ),
         "",
-        f"**Caller-supplied source:** {source_identity}",
+        f"{text('**Caller-supplied source:**')} {source_identity}",
         "",
-        "## Executive summary",
+        text("## Executive summary"),
         "",
         analysis["executiveSummary"],
         "",
-        "## Evidence state",
+        text("## Evidence state"),
         "",
         f"- Baseline: `{baseline['runId']}` — "
         f"{baseline['metric']}={baseline['value']}",
@@ -901,7 +975,7 @@ def _render_markdown(report: dict[str, Any]) -> str:
         }
         lines.extend(
             [
-                "## Portfolio mandate",
+                text("## Portfolio mandate"),
                 "",
                 f"- Mandate: `{mandate['id']}`",
                 f"- Requested direction / construction: "
@@ -1121,59 +1195,55 @@ def _render_markdown(report: dict[str, Any]) -> str:
         lines.extend(
             factor_input_availability_markdown_lines(
                 leader_decision_support,
-                heading="## Frozen leader-Run Factor input availability",
+                heading=text("## Frozen leader-Run Factor input availability"),
             )
         )
         lines.extend(
             factor_qualification_markdown_lines(
                 leader_decision_support,
-                heading="## Frozen leader-Run factor qualification",
+                heading=text("## Frozen leader-Run factor qualification"),
             )
         )
         lines.extend(
             factor_components_markdown_lines(
                 leader_decision_support,
-                heading="## Frozen leader-Run factor components",
+                heading=text("## Frozen leader-Run factor components"),
             )
         )
         lines.extend(
             mechanical_decision_markdown_lines(
                 leader_decision_support,
-                heading="## Frozen leader-Run mechanical decision",
+                heading=text("## Frozen leader-Run mechanical decision"),
             )
         )
         lines.extend(
             sizing_anatomy_markdown_lines(
                 leader_decision_support,
-                heading="## Frozen leader-Run position sizing anatomy",
+                heading=text("## Frozen leader-Run position sizing anatomy"),
             )
         )
         lines.extend(
             diversification_stress_markdown_lines(
                 leader_decision_support,
-                heading=(
-                    "## Frozen leader-Run diversification stress"
-                ),
+                heading=text("## Frozen leader-Run diversification stress"),
             )
         )
         lines.extend(
             strategy_viability_markdown_lines(
                 leader_decision_support,
-                heading="## Frozen leader-Run strategy viability",
+                heading=text("## Frozen leader-Run strategy viability"),
             )
         )
         lines.extend(
             signal_monetization_markdown_lines(
                 leader_decision_support,
-                heading=(
-                    "## Frozen leader-Run signal monetization bridge"
-                ),
+                heading=text("## Frozen leader-Run signal monetization bridge"),
             )
         )
         lines.extend(
             rl_factor_fusion_diagnosis_markdown_lines(
                 leader_decision_support,
-                heading="## Frozen leader-Run RL factor-fusion diagnosis",
+                heading=text("## Frozen leader-Run RL factor-fusion diagnosis"),
             )
         )
     policy_rationale = leader_run["metrics"].get("policy_rationale")
@@ -1192,7 +1262,7 @@ def _render_markdown(report: dict[str, Any]) -> str:
         )[:3]
         lines.extend(
             [
-                "## RL policy behavior and rationale",
+                text("## RL policy behavior and rationale"),
                 "",
                 "- Validation decisions / action runs / transition rate / "
                 "mean run length: "
@@ -1228,7 +1298,7 @@ def _render_markdown(report: dict[str, Any]) -> str:
     ):
         lines.extend(
             [
-                "## RL simple-policy challenger",
+                text("## RL simple-policy challenger"),
                 "",
                 "- Contextual baseline: "
                 "`iterative-same-pretrade-contextual-ridge-v1`",
@@ -1262,7 +1332,7 @@ def _render_markdown(report: dict[str, Any]) -> str:
         )[:5]
         lines.extend(
             [
-                "## RL incremental value attribution",
+                text("## RL incremental value attribution"),
                 "",
                 "- Method: "
                 "`selected-baseline-full-path-active-attribution-v1` "
@@ -1309,7 +1379,7 @@ def _render_markdown(report: dict[str, Any]) -> str:
         )
         lines.extend(
             [
-                "## RL one-step factor opportunity",
+                text("## RL one-step factor opportunity"),
                 "",
                 "- Method: "
                 "`actual-pretrade-one-step-governed-action-audit-v1` "
@@ -1346,7 +1416,7 @@ def _render_markdown(report: dict[str, Any]) -> str:
         )
     lines.extend(
         [
-            "## Research selection integrity",
+            text("## Research selection integrity"),
             "",
             f"- Selection metric / split: `{integrity['selectionMetric']}` / "
             f"`{integrity['selectionSplit']}`",
@@ -1437,7 +1507,7 @@ def _render_markdown(report: dict[str, Any]) -> str:
                 f"- Adjustment unavailable reason: "
                 f"`{adjustment['reason']}`"
             )
-    lines.extend(["", "## Findings", ""])
+    lines.extend(["", text("## Findings"), ""])
     for finding in analysis["findings"]:
         refs = ", ".join(_evidence_label(item) for item in finding["evidenceRefs"])
         lines.extend(
@@ -1446,11 +1516,11 @@ def _render_markdown(report: dict[str, Any]) -> str:
                 "",
                 finding["claim"],
                 "",
-                f"Confidence: **{finding['confidence']}**. Evidence: {refs}.",
+                f"{text('Confidence:')} **{finding['confidence']}**. {text('Evidence:')} {refs}.",
                 "",
             ]
         )
-    lines.extend(["## Recommendations", ""])
+    lines.extend([text("## Recommendations"), ""])
     if analysis["recommendations"]:
         for index, recommendation in enumerate(analysis["recommendations"], start=1):
             refs = ", ".join(
@@ -1461,32 +1531,32 @@ def _render_markdown(report: dict[str, Any]) -> str:
                     f"{index}. **{recommendation['action']}** — "
                     f"{recommendation['rationale']}",
                     "",
-                    "   Conditions: "
+                    text("   Conditions: ")
                     + (
                         "; ".join(recommendation["conditions"])
                         if recommendation["conditions"]
-                        else "none declared"
+                        else text("none declared")
                     )
-                    + f". Evidence: {refs}.",
+                    + f". {text('Evidence:')} {refs}.",
                     "",
                 ]
             )
     else:
-        lines.extend(["No action recommendation was made.", ""])
-    lines.extend(["## Limitations", ""])
+        lines.extend([text("No action recommendation was made."), ""])
+    lines.extend([text("## Limitations"), ""])
     lines.extend(
         [f"- {item}" for item in analysis["limitations"]]
-        or ["- No additional limitations were declared."]
+        or [text("- No additional limitations were declared.")]
     )
-    lines.extend(["", "## Unresolved questions", ""])
+    lines.extend(["", text("## Unresolved questions"), ""])
     lines.extend(
         [f"- {item}" for item in analysis["unresolvedQuestions"]]
-        or ["- No unresolved questions were declared."]
+        or [text("- No unresolved questions were declared.")]
     )
     lines.extend(
         [
             "",
-            "## Reproducibility and handoff",
+            text("## Reproducibility and handoff"),
             "",
             f"- Report: `{report['id']}`",
             f"- Brief: `{report['brief']['id']}`",
@@ -1504,8 +1574,10 @@ def _render_markdown(report: dict[str, Any]) -> str:
                 else []
             ),
             "",
-            "Publish this exact Markdown through OpenAlice Inbox to let OpenAlice",
-            "stamp authoritative Workspace, Session, and document-revision provenance.",
+            text(
+                "Publish this exact Markdown through OpenAlice Inbox to let OpenAlice\n"
+                "stamp authoritative Workspace, Session, and document-revision provenance."
+            ),
             "",
         ]
     )
@@ -2238,6 +2310,16 @@ REPORT_ANALYSIS_JSON_SCHEMA: dict[str, Any] = {
     "properties": {
         "schemaVersion": {"const": SCHEMA_VERSION},
         "kind": {"const": REPORT_ANALYSIS_KIND},
+        "language": {
+            "type": "string",
+            "enum": list(REPORT_ANALYSIS_LANGUAGES),
+            "default": "en",
+            "description": (
+                "Language of authored prose: en (English) or th (Thai). "
+                "Selects report section scaffolding without translating prose "
+                "or machine evidence. Omission preserves historical English output."
+            ),
+        },
         "authoringState": {
             "enum": sorted(REPORT_ANALYSIS_AUTHORING_STATES),
             "description": (
