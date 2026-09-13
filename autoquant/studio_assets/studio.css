@@ -1,7 +1,10 @@
 :root {
   color-scheme: dark;
+  /* Latin resolves to Inter; Thai has no glyphs there and falls through to the
+     named Thai faces rather than an arbitrary system fallback. */
   font-family:
     Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Noto Sans Thai", "IBM Plex Sans Thai", Thonburi, "Leelawadee UI",
     sans-serif;
   font-synthesis: none;
   --bg: #0b0d0a;
@@ -23,8 +26,10 @@
   --type-meta: 11px;
   --type-data: 12px;
   --type-body: 13px;
-  --leading-data: 16px;
-  --leading-body: 20px;
+  /* Thai stacks สระบน + วรรณยุกต์ above the base glyph, so the line box needs
+     ~1.6x. 16px/12px (1.33) clipped tone marks. */
+  --leading-data: 19px;
+  --leading-body: 21px;
   --rail: 216px;
   --inspector: 304px;
 }
@@ -288,7 +293,7 @@ a:focus-visible,
   overflow: hidden;
   color: #d7dacd;
   font-size: var(--type-meta);
-  line-height: 1.35;
+  line-height: 1.45;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -545,7 +550,7 @@ main > div[id] {
   max-width: 980px;
   margin: 7px 0 6px;
   font-size: clamp(27px, 2.7vw, 38px);
-  line-height: 1.04;
+  line-height: 1.2;
   letter-spacing: -0.045em;
 }
 
@@ -630,7 +635,7 @@ main > div[id] {
   margin: 8px 0 4px;
   color: #ece9df;
   font-size: 17px;
-  line-height: 1.15;
+  line-height: 1.3;
   letter-spacing: -0.025em;
 }
 
@@ -785,7 +790,7 @@ main > div[id] {
   margin: 12px 0 7px;
   color: #e8e9df;
   font-size: 13px;
-  line-height: 1.25;
+  line-height: 1.35;
 }
 
 .research-move-hypothesis {

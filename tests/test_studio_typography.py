@@ -22,8 +22,8 @@ class StudioTypographyTests(unittest.TestCase):
             "--type-meta: 11px",
             "--type-data: 12px",
             "--type-body: 13px",
-            "--leading-data: 16px",
-            "--leading-body: 20px",
+            "--leading-data: 19px",
+            "--leading-body: 21px",
         ):
             self.assertIn(declaration, CSS)
 
@@ -74,6 +74,44 @@ class StudioTypographyTests(unittest.TestCase):
         self.assertIn("font-size: clamp(27px, 2.7vw, 38px)", rule(".hero-copy h1"))
         self.assertIn("font-size: 17px", rule(".decision-brief h2"))
         self.assertIn("font-size: 13px", rule(".handoff-card h3"))
+
+    def test_declares_thai_faces_so_thai_prose_does_not_fall_back_arbitrarily(
+        self,
+    ) -> None:
+        root = rule(":root")
+        for face in ("Noto Sans Thai", "IBM Plex Sans Thai", "Thonburi"):
+            self.assertIn(face, root)
+        # Latin must still resolve to Inter first.
+        self.assertLess(root.index("Inter"), root.index("Noto Sans Thai"))
+
+    def test_leading_clears_stacked_thai_tone_marks(self) -> None:
+        """Thai stacks a vowel and a tone mark above the base glyph.
+
+        Below ~1.5 the marks clip against the line above, so every role that
+        carries model-authored prose has to keep that headroom.
+        """
+        roles = {"--type-data": "--leading-data", "--type-body": "--leading-body"}
+        root = rule(":root")
+        for size_var, leading_var in roles.items():
+            size = float(re.search(rf"{size_var}: ([0-9.]+)px", root).group(1))
+            leading = float(re.search(rf"{leading_var}: ([0-9.]+)px", root).group(1))
+            self.assertGreaterEqual(
+                leading / size,
+                1.5,
+                f"{leading_var}/{size_var} = {leading / size:.2f}, clips Thai",
+            )
+
+        for selector in (
+            ".hero-copy h1",
+            ".decision-brief h2",
+            ".research-move h3",
+            ".workspace-context > strong",
+        ):
+            block = rule(selector)
+            ratio = float(re.search(r"line-height: ([0-9.]+)\s*;", block).group(1))
+            self.assertGreaterEqual(
+                ratio, 1.2, f"{selector} line-height {ratio} clips Thai tone marks"
+            )
 
 
 if __name__ == "__main__":
